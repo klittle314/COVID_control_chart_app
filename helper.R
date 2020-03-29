@@ -41,10 +41,9 @@ make_country_data <- function(data,country_name,start_date,buffer_days){
   
   #should handle the break in the series more elegantly
   
-  cchart_df <- data.frame(data_use[!is.na(data_use$log_count_deaths),c("dateRep","serial_day")],
+  cchart_df <- data.frame(data_use[!is.na(data_use$log_count_deaths),c("dateRep","serial_day","log_count_deaths")],
                           lm_out$residuals,c(NA,diff(lm_out$residuals)),lm_out$fitted.values)
-  
-  
+  names(cchart_df)[5] <- "moving_range"
   
   AvgMR <- mean(abs(cchart_df$lm_out.residuals))
   cchart_df$UCL <- lm_out$fitted.values+2.66*mean(AvgMR,na.rm=TRUE)
@@ -56,6 +55,7 @@ make_country_data <- function(data,country_name,start_date,buffer_days){
   buffer_dates <- seq.Date(from=max(cchart_df$dateRep)+1,to=max(cchart_df$dateRep)+buffer,by="day")
   buffer_df <- cbind.data.frame(buffer_dates,
                                 buffer_serial_day,
+                                rep(NA,buffer),
                                 rep(NA,buffer),
                                 rep(NA,buffer),
                                 predicted_value,
