@@ -56,9 +56,19 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     #The default value should be chosen by code:  requires at least 8 days no more than 20
                                     numericInput("baseline_n", label = h4("Days used to compute baseline"), value = 15, min = 8, max = 30),
                                     
-                                    ),
+                                    textAreaInput(
+                                      inputId = 'chart_caption',
+                                      label   = h4('Add caption to chart:'),
+                                      value   = '',
+                                      width   = '100%')
+                                    
+                                ),
                                 mainPanel(
-                                    plotOutput("control_chart",height="500px")
+                                    plotOutput("control_chart",height="500px"),
+                                    
+                                    downloadButton(outputId = 'download_chart',
+                                                   label = 'Download Chart')
+                                    
                                 )
                             )
                    )
