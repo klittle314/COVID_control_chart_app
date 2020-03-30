@@ -14,11 +14,12 @@ shinyServer(function(input, output, session) {
     control_chart <- reactive({
         country_use <- input$choose_country
         buffer <- input$buffer
+        baseline1 <- input$baseline_n
         df <- df1
         list_use <- make_country_data(data=df,
                                       country_name=country_use,
-                                      start_date=as.Date("2020-03-01"),
-                                      buffer_days=buffer)
+                                      buffer_days=buffer,
+                                      baseline=baseline1)
         data_use <- list_use[[1]]
         df_cchart <- list_use[[2]]
         lm_out <- list_use[[3]]
