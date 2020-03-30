@@ -57,7 +57,10 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     
                                     ),
                                 mainPanel(
-                                    plotOutput("control_chart",height="500px")
+                                    plotOutput("control_chart",height="500px"),
+                                    
+                                    downloadButton(outputId = 'download_chart',
+                                                   label = 'Download Chart')
                                 )
                             )
                    )

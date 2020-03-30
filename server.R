@@ -49,4 +49,14 @@ shinyServer(function(input, output, session) {
     output$control_chart <- renderPlot({
         print(control_chart())
     })
+    
+    output$download_chart <- downloadHandler(
+        filename = sprintf('%s_%s_days.png', input$choose_country, input$baseline_n),
+        content = function(file) {
+            
+            png(file, width = 1000, height = 600)
+                print(control_chart())
+            dev.off(which=dev.cur())
+        }
+    )
 })
