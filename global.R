@@ -17,6 +17,6 @@ if (!local) {
 }
 
 df1 <- read_csv(data_file)
-df1$dateRep <- as.Date(df1$dateRep)
+df1$dateRep <- as.Date(df1$dateRep, format = '%d/%m/%Y')
 
 country_names <- unique(df1$countriesAndTerritories)
