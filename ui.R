@@ -14,6 +14,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                 a(href="https://www.usnews.com/news/healthiest-communities/articles/2020-03-26/coronavirus-pandemic-reaching-critical-tipping-point-in-america-analysis-shows",
                                 "link to USNWR article"),
                                 br(),
+                                helpText("Disclaimer:  App under construction, use with caution"),
                                 helpText("Questions? Contact Kevin Little, Ph.D. or other contact information"),
                                 br(),
                                 
