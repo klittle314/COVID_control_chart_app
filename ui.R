@@ -31,7 +31,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                             
                             sidebarLayout(
                                 sidebarPanel( 
-                                    h3("View HomeLAN Data by selecting a Measure"),
+                                    h3("Construct Control Chart by selecting a country"),
                                     
                                     #drop down to select the Site Type
                                     # htmlOutput("selectSiteType"),
@@ -47,14 +47,16 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     
                                     #Numeric input for buffer
                                     # Copy the line below to make a number input box into the UI.
-                                    numericInput("buffer", label = h3("Days beyond end of data series"), value = 10),
+                                    numericInput("buffer", label = h3("Days beyond end of data series"), value = 10, min=1),
                                     
                                     br(),
-                                    
+                                    #Numeric input for baseline series length used to compute control limits
+                                    #The default value should be chosen by code:  requires at least 8 days no more than 20
+                                    numericInput("baseline_n", label = h3("Days used to compute baseline"), value = 15, min = 8, max = 20),
                                     
                                     ),
                                 mainPanel(
-                                    plotOutput("control_chart",height="600px")
+                                    plotOutput("control_chart",height="500px")
                                 )
                             )
                    )
