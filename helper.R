@@ -77,7 +77,6 @@ make_country_data <- function(data,country_name,buffer_days,baseline){
   #fill out the data table if not all observations are used to compute the control limits
   df_check <- df1_X_deaths[df1_X_deaths$serial_day > baseline,]
   if(!is.null(df_check)){
-    check_serial_day <- 
     check_predicted_value <- lm_out$coefficients[1]+ lm_out$coefficients[2]*df_check$serial_day
     
     df_check_out <- cbind.data.frame(df_check[,c(1:3)],
