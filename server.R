@@ -26,11 +26,17 @@ shinyServer(function(input, output, session) {
         
         p0 <- ggplot(data=data_use,aes(x=dateRep,y=deaths_nudge))+
             theme_bw()+
-            geom_point(size=rel(2.0),colour="blue")+
+            geom_point(size=rel(3.0),colour="blue")+
             geom_line()+
             labs(title=paste0(country_use," Daily New Deaths"), caption="Source: https://ourworldindata.org/coronavirus-source-data, 27 Mar 2020")+
             xlab("Date")+
-            xlim(min(data_use$dateRep),max(data_use$dateRep)+buffer)
+            ylab("Deaths per day")+
+            xlim(min(data_use$dateRep),max(data_use$dateRep)+buffer)+
+            theme(axis.text.x=element_text(size=rel(1.5)))+
+            theme(axis.text.y=element_text(size=rel(1.5)))+
+            theme(axis.title.x=element_text(size=rel(1)))+
+            theme(axis.title.y=element_text(size=rel(1),angle=0,vjust=0.5))+
+            theme(title=element_text(size=rel(1.5)))
         
         p3 <- p0 + geom_line(data=df_cchart,aes(x=dateRep,y=predict),linetype="solid",colour="red")+
             geom_line(data=df_cchart,aes(x=dateRep,y=UCL_anti_log),linetype="dotted")+
