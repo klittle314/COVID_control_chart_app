@@ -11,7 +11,8 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                             wellPanel(
                                 tags$style(type="text/css", '#leftPanel { width:200px; float:left;}'),
                                 helpText("Link or other info goes here"),
-                                
+                                a(href="https://www.usnews.com/news/healthiest-communities/articles/2020-03-26/coronavirus-pandemic-reaching-critical-tipping-point-in-america-analysis-shows",
+                                "link to USNWR article"),
                                 br(),
                                 helpText("Questions? Contact Kevin Little, Ph.D. or other contact information"),
                                 br(),
@@ -22,7 +23,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                 em(
                                     span("Created by "),
                                     a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
-                                    span("updated 28 Mar 2020"),
+                                    span("updated 29 Mar 2020"),
                                     br(), br()
                                 )
                             )
@@ -47,12 +48,12 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     
                                     #Numeric input for buffer
                                     # Copy the line below to make a number input box into the UI.
-                                    numericInput("buffer", label = h3("Days beyond end of data series"), value = 10, min=1),
+                                    numericInput("buffer", label = h4("Days beyond end of data series"), value = 10, min=1),
                                     
                                     br(),
                                     #Numeric input for baseline series length used to compute control limits
                                     #The default value should be chosen by code:  requires at least 8 days no more than 20
-                                    numericInput("baseline_n", label = h3("Days used to compute baseline"), value = 15, min = 8, max = 20),
+                                    numericInput("baseline_n", label = h4("Days used to compute baseline"), value = 15, min = 8, max = 30),
                                     
                                     ),
                                 mainPanel(
