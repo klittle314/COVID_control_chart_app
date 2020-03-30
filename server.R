@@ -28,7 +28,10 @@ shinyServer(function(input, output, session) {
             theme_bw()+
             geom_point(size=rel(3.0),colour="blue")+
             geom_line()+
-            labs(title=paste0(country_use," Daily New Deaths"), caption="Source: https://ourworldindata.org/coronavirus-source-data, 27 Mar 2020")+
+            labs(title=paste0(country_use," Daily New Deaths"), 
+                 caption = sprintf('%s\n\nSource: https://opendata.ecdc.europa.eu/covid19/casedistribution/csv, %s',
+                                   input$chart_caption,
+                                   as.character(Sys.Date()))) +
             xlab("Date")+
             ylab("Deaths per day")+
             xlim(min(data_use$dateRep),max(data_use$dateRep)+buffer)+
@@ -36,7 +39,8 @@ shinyServer(function(input, output, session) {
             theme(axis.text.y=element_text(size=rel(1.5)))+
             theme(axis.title.x=element_text(size=rel(1)))+
             theme(axis.title.y=element_text(size=rel(1),angle=0,vjust=0.5))+
-            theme(title=element_text(size=rel(1.5)))
+            theme(title=element_text(size=rel(1.5))) +
+            theme(plot.caption = element_text(hjust = 0))
         
         p3 <- p0 + geom_line(data=df_cchart,aes(x=dateRep,y=predict),linetype="solid",colour="red")+
             geom_line(data=df_cchart,aes(x=dateRep,y=UCL_anti_log),linetype="dotted")+
