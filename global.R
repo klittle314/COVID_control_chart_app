@@ -6,14 +6,17 @@ library(utils)
 library(httr)
 source("helper.R")
 
-#download the dataset from the ECDC website to a local temporary file--not playing nice with Windows /
-tf <- tempfile(fileext = '.csv')
+local <- TRUE
 
-covid_data <- httr::GET("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv", 
-                        authenticate(":", ":", type="ntlm"),
-                        write_disk(tf))
+data_file <- 'data/ecdc_data.csv'
 
-df1 <- read_csv(tf)
+if (!local) {
+  covid_data <- httr::GET("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv", 
+                          authenticate(":", ":", type="ntlm"),
+                          write_disk(data_file))
+}
+
+df1 <- read_csv(data_file)
 df1$dateRep <- as.Date(df1$dateRep)
 
 country_names <- unique(df1$countriesAndTerritories)
