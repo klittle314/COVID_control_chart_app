@@ -18,21 +18,28 @@ zero_NA <- function(x){
 }
 
 #function to subset master data set by country_name, start_date and pad by buffer_days
-make_country_data <- function(data,country_name,start_date,buffer_days){
+make_country_data <- function(data,country_name,buffer_days,baseline){
   df1_X <- data %>% filter(countriesAndTerritories == country_name) %>% arrange(dateRep)
   
-  #determine when to start the series for U.S. March 1
+  #determine when to start the series
+  
+  dates_single_death <- df1_X$dateRep[which(df1_X$deaths==1)]
+  start_date <- dates_single_death[1]
+  
+  ##catch failure:  if data do not yield series with non zero deaths, then exit with message
   
   df1_X_deaths <- df1_X %>% filter(dateRep >= start_date)
   
  
-  
-  df1_X_deaths$deaths_nudge <- unlist(lapply(df1_X_deaths$deaths,zero_NA))
+  #per Provost discussion, simply add 1 to deaths uniformly:  
+  #KL note:  I think setting value to NA for a zero in the initial series makes more sense.
+  #df1_X_deaths$deaths_nudge <- unlist(lapply(df1_X_deaths$deaths,zero_NA))
+  df1_X_deaths$deaths_nudge <- df1_X_deaths$deaths + 1
   
   df1_X_deaths$log_count_deaths <- log10(df1_X_deaths$deaths_nudge)
   df1_X_deaths$serial_day <- c(1:nrow(df1_X_deaths))
   
-  data_use <- df1_X_deaths
+  data_use <- df1_X_deaths[df1_X_deaths$serial_day <= baseline,]
   buffer <- buffer_days
   
   #create linear model
