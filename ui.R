@@ -29,6 +29,37 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                 )
                             )
                    ),
+                   
+                   tabPanel('Upload Data',
+                     
+                     h4('To upload your own data series, please create a CSV file with the following column names:'),
+                     
+                     tags$ul(
+                       tags$li('date (DD/MM/YYYY format)'),
+                       tags$li('cases'),
+                       tags$li('deaths'),
+                       tags$li('location')
+                     ),
+                     
+                     h5('Click',
+                        tags$a('here', 
+                               href = 'https://support.office.com/en-us/article/Import-or-export-text-txt-or-csv-files-5250ac4c-663c-47ce-937b-339e391393ba',
+                               target = '_blank'),
+                        'for help creating a CSV file in Excel.'),
+                     
+                     tags$br(),
+                     
+                     fileInput(
+                       inputId = 'upload_data',
+                       label   = 'Select data:',
+                       accept  = c('text/csv', '.csv')),
+                     
+                     uiOutput('upload_message'),
+                     
+                     uiOutput('upload_confirm')
+                     
+                   ),
+                   
                    tabPanel("Display",
                             
                             sidebarLayout(

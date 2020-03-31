@@ -4,9 +4,10 @@ library(tidyverse)
 library(readxl)
 library(utils)
 library(httr)
+library(DT)
 source("helper.R")
 
-local <- FALSE
+local <- TRUE
 
 data_file <- 'data/ecdc_data.csv'
 
