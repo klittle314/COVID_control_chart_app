@@ -87,10 +87,12 @@ shinyServer(function(input, output, session) {
         country_use <- input$choose_country
         buffer <- input$buffer
         baseline1 <- input$baseline_n
+        start_date1 <- input$start_date
         list_use <- make_country_data(data=data(),
                                       country_name=country_use,
                                       buffer_days=buffer,
-                                      baseline=baseline1)
+                                      baseline=baseline1,
+                                      start_date=start_date1)
         data_use <- list_use[[1]]
         df_cchart <- list_use[[2]]
         lm_out <- list_use[[3]]
