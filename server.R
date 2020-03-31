@@ -66,7 +66,7 @@ shinyServer(function(input, output, session) {
         data_add <- upload_data()[c('date', 'cases', 'deaths', 'location')]
         colnames(data_add) <- c('dateRep', 'cases', 'deaths', 'countriesAndTerritories')
         
-        data_add$dateRep <- as.Date(data_add$dateRep, format = '%d/%m/%Y')
+        data_add$dateRep <- as.Date(data_add$dateRep, format = '%m/%d/%Y')
         
         data(dplyr::bind_rows(data(), data_add))
         
@@ -95,14 +95,23 @@ shinyServer(function(input, output, session) {
         df_cchart <- list_use[[2]]
         lm_out <- list_use[[3]]
         
+        # #choose caption depending on source
+        # if(is.null(isolate(upload_message()))){
+        #     caption1 <- sprintf('%s\n\nSource: https://opendata.ecdc.europa.eu/covid19/casedistribution/csv, %s',
+        #                         input$chart_caption,
+        #                         as.character(Sys.Date()))
+        # } else caption1 <- paste0("My local file")
+        # 
+        caption1 <- sprintf('%s\n\nSource: https://opendata.ecdc.europa.eu/covid19/casedistribution/csv, %s',
+                            input$chart_caption,
+                            as.character(Sys.Date()))
+        
         p0 <- ggplot(data=data_use,aes(x=dateRep,y=deaths_nudge))+
             theme_bw()+
             geom_point(size=rel(3.0),colour="blue")+
             geom_line()+
             labs(title=paste0(country_use," Daily New Deaths"), 
-                 caption = sprintf('%s\n\nSource: https://opendata.ecdc.europa.eu/covid19/casedistribution/csv, %s',
-                                   input$chart_caption,
-                                   as.character(Sys.Date()))) +
+                 caption = caption1) +
             xlab("Date")+
             ylab("Deaths per day")+
             xlim(min(data_use$dateRep),max(data_use$dateRep)+buffer)+

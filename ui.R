@@ -24,7 +24,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                 em(
                                     span("Created by "),
                                     a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
-                                    span("updated 30 Mar 2020"),
+                                    span("updated 31 Mar 2020"),
                                     br(), br()
                                 )
                             )
@@ -32,10 +32,10 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                    
                    tabPanel('Upload Data',
                      
-                     h4('To upload your own data series, please create a CSV file with the following column names:'),
+                     h4('To upload your own data series, please create a CSV file with the following column names (case sensitive):'),
                      
                      tags$ul(
-                       tags$li('date (DD/MM/YYYY format)'),
+                       tags$li('date (MM/DD/YYYY format)'),
                        tags$li('cases'),
                        tags$li('deaths'),
                        tags$li('location')
@@ -64,7 +64,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                             
                             sidebarLayout(
                                 sidebarPanel( 
-                                    h3("Construct Control Chart by selecting a country"),
+                                    h3("Construct Control Chart by selecting a location"),
                                     
                                     #drop down to select the Site Type
                                     # htmlOutput("selectSiteType"),
