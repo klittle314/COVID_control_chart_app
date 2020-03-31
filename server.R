@@ -55,7 +55,9 @@ shinyServer(function(input, output, session) {
     })
     
     output$download_chart <- downloadHandler(
-        filename = sprintf('%s_%s_days.png', input$choose_country, input$baseline_n),
+        filename = function() {
+            sprintf('%s_%s_days.png', input$choose_country, input$baseline_n)
+        },
         content = function(file) {
             
             png(file, width = 1000, height = 600)
