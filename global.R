@@ -6,14 +6,14 @@ library(utils)
 library(httr)
 source("helper.R")
 
-local <- TRUE
+local <- FALSE
 
 data_file <- 'data/ecdc_data.csv'
 
 if (!local) {
   covid_data <- httr::GET("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv", 
                           authenticate(":", ":", type="ntlm"),
-                          write_disk(data_file))
+                          write_disk(data_file,overwrite=TRUE))
 }
 
 df1 <- read_csv(data_file)
