@@ -9,14 +9,85 @@ shinyServer(function(input, output, session) {
     print(R.version.string)
     print('sessionInfo():')
     print(sessionInfo())
+    
+    data <- reactiveVal(value = df1)
 
- 
+    upload_data <- reactive({
+        req(input$upload_data)
+        
+        try({
+            read.csv(input$upload_data$datapath,
+                     header = TRUE,
+                     stringsAsFactors = FALSE)
+        })
+    })
+    
+    upload_message <- reactive({
+        if ('try-error' %in% class(upload_data())) {
+            
+            'There was a problem reading your file. Please confirm that it is in CSV format, and that you selected the correct file.'
+            
+        } else if (!all(c('date', 'cases', 'deaths', 'location') %in% colnames(upload_data()))) {
+            
+            missing_cols <- setdiff(c('date', 'cases', 'deaths', 'location'), colnames(upload_data()))
+            paste0('Columns missing from CSV file: ', paste0(missing_cols, collapse = ', '))
+            
+        } else {
+            
+            output$upload_confirm <- renderUI({
+                
+                list(
+                    tags$br(),
+                    
+                    h4('Preview'),
+                    
+                    DT::renderDataTable(
+                        datatable(upload_data(),
+                                  rownames = FALSE)),
+                    
+                    actionButton(
+                        inputId = 'upload_confirm',
+                        label   = 'Confirm'))
+            })
+            
+            'Data successfully uploaded and parsed.'
+        }
+    })
+    
+    output$upload_message <- renderUI({
+        req(upload_message())
+        
+        h5(upload_message())
+    })
+    
+    observeEvent(input$upload_confirm, {
+        req(upload_data())
+        
+        data_add <- upload_data()[c('date', 'cases', 'deaths', 'location')]
+        colnames(data_add) <- c('dateRep', 'cases', 'deaths', 'countriesAndTerritories')
+        
+        data_add$dateRep <- as.Date(data_add$dateRep, format = '%d/%m/%Y')
+        
+        data(dplyr::bind_rows(data(), data_add))
+        
+        updateSelectInput(
+            session = session,
+            inputId = 'choose_country',
+            choices = sort(unique(isolate(data()$countriesAndTerritories))))
+        
+        output$upload_confirm <- renderUI({
+            list(
+                tags$br(),
+                
+                h4('Data successfully added. Switch to Display tab to view.'))
+        })
+    })
+    
     control_chart <- reactive({
         country_use <- input$choose_country
         buffer <- input$buffer
         baseline1 <- input$baseline_n
-        df <- df1
-        list_use <- make_country_data(data=df,
+        list_use <- make_country_data(data=data(),
                                       country_name=country_use,
                                       buffer_days=buffer,
                                       baseline=baseline1)
@@ -55,7 +126,9 @@ shinyServer(function(input, output, session) {
     })
     
     output$download_chart <- downloadHandler(
-        filename = sprintf('%s_%s_days.png', input$choose_country, input$baseline_n),
+        filename = function() {
+            sprintf('%s_%s_days.png', input$choose_country, input$baseline_n)
+        },
         content = function(file) {
             
             png(file, width = 1000, height = 600)

@@ -4,6 +4,7 @@ library(tidyverse)
 library(readxl)
 library(utils)
 library(httr)
+library(DT)
 source("helper.R")
 
 local <- TRUE
@@ -13,7 +14,7 @@ data_file <- 'data/ecdc_data.csv'
 if (!local) {
   covid_data <- httr::GET("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv", 
                           authenticate(":", ":", type="ntlm"),
-                          write_disk(data_file))
+                          write_disk(data_file,overwrite=TRUE))
 }
 
 df1 <- read_csv(data_file)
