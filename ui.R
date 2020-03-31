@@ -70,7 +70,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     # htmlOutput("selectSiteType"),
                                     # br(),
                                     
-                                    #drop down to select the Measure
+                                    #drop down to select the location
                                     selectInput(
                                         inputId = 'choose_country',
                                         label = h4("Choose country to create control chart"),
@@ -86,6 +86,10 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     #Numeric input for baseline series length used to compute control limits
                                     #The default value should be chosen by code:  requires at least 8 days no more than 20
                                     numericInput("baseline_n", label = h4("Days used to compute baseline"), value = 15, min = 8, max = 30),
+                                    
+                                    br(),
+                                    #Input date that marks the start of the limit calculations
+                                    dateInput("start_date","Date:",value="2019-12-31"),
                                     
                                     textAreaInput(
                                       inputId = 'chart_caption',
