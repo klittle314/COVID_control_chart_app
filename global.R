@@ -1,5 +1,7 @@
-#This script is front-end for shiny app that implements the control chart approach for exponentially growing data
-# series by Provost et al.
+# This script is a front-end for shiny app that implements the control chart approach for exponentially growing data
+# series by Provost et al. March 2020.
+# Drafted by Kevin Little, Ph.D. with help from Mason DeCamillis, Lynda Finn, and Emily Jones
+
 library(tidyverse)
 library(readxl)
 library(utils)

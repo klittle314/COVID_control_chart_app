@@ -1,7 +1,8 @@
 #helper files
 
 #NA functions
-#LF trick
+
+#LF trick  function
 nudge_zero <- function(x){
   if(identical(x,0)){
     x <- 0.1
@@ -9,7 +10,7 @@ nudge_zero <- function(x){
   return(x)
 }
 
-#NA conversion
+#function to do NA conversion
 zero_NA <- function(x){
   if(identical(x,0)){
     x <- NA
@@ -17,22 +18,54 @@ zero_NA <- function(x){
   return(x)
 }
 
+#function to find index that marks first sequence of length_use values.  Default length = 8 per Lloyd Provost 30 March 2020 
+index_test <- function(x,index,length_use=8){
+  x_check <- x[index:(index+length_use - 1)]
+  if(all(x_check>0)){
+    use_seq <- TRUE
+    index_use <- index
+  } else {
+    use_seq <- FALSE
+    index_use <- index + 1
+  }
+  return(list(use_seq,index_use))
+}
+
 #function to subset master data set by country_name, start_date and pad by buffer_days
-make_country_data <- function(data,country_name,buffer_days,baseline){
+make_country_data <- function(data,country_name,buffer_days,baseline,start_date){
   df1_X <- data %>% filter(countriesAndTerritories == country_name) %>% arrange(dateRep)
   
-  #determine when to start the series
   
-  dates_single_death <- df1_X$dateRep[which(df1_X$deaths==1)]
-  start_date <- dates_single_death[1]
+  if(start_date==as.Date("2019-12-31")){
+  #determine initial start to the series:  first death
   
-  ##catch failure:  if data do not yield series with non zero deaths, then exit with message
+    dates_single_death <- df1_X$dateRep[which(df1_X$deaths==1)]
+    start_date0 <- dates_single_death[1]
   
-  df1_X_deaths <- df1_X %>% filter(dateRep >= start_date)
+   ##catch failure:  if data do not yield series with non zero deaths, then exit with message
   
+    df1_X_deaths <- df1_X %>% filter(dateRep >= start_date0)
+  
+
+    #find starting index of the series that has length_use=8 death values greater than 0
+    i <- 1
+    index_fail = TRUE
+    while(index_fail) {
+      index_check <- index_test(df1_X_deaths$deaths,i,length_use=8)
+      if(index_check[[1]]) {
+        index <- index_check[[2]]
+        index_fail <- FALSE
+      } else i <- i + 1
+    }
+    
+    #subset the data file so it starts with a sequence of 8 non-negative deaths
+    df1_X_deaths <- df1_X_deaths[index:nrow(df1_X_deaths),]
+  } else {
+    df1_X_deaths <- df1_X %>% filter(dateRep >= as.Date(start_date)) 
+  } 
  
-  #per Provost discussion, simply add 1 to deaths uniformly:  
-  #KL note:  I think setting value to NA for a zero in the initial series makes more sense.
+  #per Provost discussion, you can simply add 1 to deaths uniformly in the series.  
+  #KL note:  setting value to NA for a zero after an initial 8 non-zero values.
   df1_X_deaths$deaths_nudge <- unlist(lapply(df1_X_deaths$deaths,zero_NA))
   #df1_X_deaths$deaths_nudge <- df1_X_deaths$deaths + 1
   
