@@ -7,7 +7,7 @@ library(httr)
 library(DT)
 source("helper.R")
 
-local <- TRUE
+local <- FALSE
 
 data_file <- 'data/ecdc_data.csv'
 
