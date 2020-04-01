@@ -34,20 +34,17 @@ index_test <- function(x,index,length_use=8){
 #function to subset master data set by country_name, start_date and pad by buffer_days
 make_country_data <- function(data,country_name,buffer_days,baseline,start_date){
   df1_X <- data %>% filter(countriesAndTerritories == country_name) %>% arrange(dateRep)
+  dates_of_deaths <- df1_X$dateRep[which(df1_X$deaths>0)]
+  start_date0 <- dates_of_deaths[1]
   
+  ##catch failure:  if data do not yield series with non zero deaths, then exit with message##
+  
+  df1_X_deaths <- df1_X %>% filter(dateRep >= start_date0)
+ 
   
   if(start_date==as.Date("2019-12-31")){
-  #determine initial start to the series:  first death
-  
-    dates_single_death <- df1_X$dateRep[which(df1_X$deaths==1)]
-    start_date0 <- dates_single_death[1]
-  
-   ##catch failure:  if data do not yield series with non zero deaths, then exit with message
-  
-    df1_X_deaths <- df1_X %>% filter(dateRep >= start_date0)
-  
-
-    #find starting index of the series that has length_use=8 death values greater than 0
+  #if default 12/31/2019 start date, determine initial start to the series:  date of first death(s) 
+  #find starting index of the series that has length_use=8 death values greater than 0
     i <- 1
     index_fail = TRUE
     while(index_fail) {
@@ -58,10 +55,11 @@ make_country_data <- function(data,country_name,buffer_days,baseline,start_date)
       } else i <- i + 1
     }
     
-    #subset the data file so it starts with a sequence of 8 non-negative deaths
+    #subset the data file so it starts with the sequence of 8 non-negative deaths
     df1_X_deaths <- df1_X_deaths[index:nrow(df1_X_deaths),]
   } else {
-    df1_X_deaths <- df1_X %>% filter(dateRep >= as.Date(start_date)) 
+    #take only data records starting with deaths, don't allow prior dates
+    df1_X_deaths <- df1_X %>% filter(dateRep >= max(as.Date(start_date),as.Date(start_date0))) 
   } 
  
   #per Provost discussion, you can simply add 1 to deaths uniformly in the series.  
