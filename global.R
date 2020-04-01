@@ -9,6 +9,7 @@ library(httr)
 library(DT)
 source("helper.R")
 
+#set local to FALSE if you want to read in the Open Data Table from the EOC
 local <- FALSE
 
 data_file <- 'data/ecdc_data.csv'
