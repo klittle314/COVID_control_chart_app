@@ -10,12 +10,12 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                             h3("Web App: HomeLAN Community Data and Display"),
                             wellPanel(
                                 tags$style(type="text/css", '#leftPanel { width:200px; float:left;}'),
-                                helpText("Link or other info goes here"),
+                                helpText("U.S. News and World Report 3-26-2020 uses the method implemented here"),
                                 a(href="https://www.usnews.com/news/healthiest-communities/articles/2020-03-26/coronavirus-pandemic-reaching-critical-tipping-point-in-america-analysis-shows",
-                                "link to USNWR article"),
+                                "click to link to USNWR article"),
                                 br(),
                                 helpText("Disclaimer:  App under construction, use with caution"),
-                                helpText("Questions? Contact Kevin Little, Ph.D. or other contact information"),
+                                helpText("Questions? Contact Kevin Little, Ph.D."),
                                 br(),
                                 
                                 
@@ -24,7 +24,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                 em(
                                     span("Created by "),
                                     a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
-                                    span("updated 31 Mar 2020"),
+                                    span("updated 1 April 2020"),
                                     br(), br()
                                 )
                             )
@@ -64,7 +64,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                             
                             sidebarLayout(
                                 sidebarPanel( 
-                                    h3("Construct Control Chart by selecting a location"),
+                                    h4("Build a control chart by choosing location and adjusting options"),
                                     
                                     #drop down to select the Site Type
                                     # htmlOutput("selectSiteType"),
@@ -73,29 +73,32 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     #drop down to select the location
                                     selectInput(
                                         inputId = 'choose_country',
-                                        label = h4("Choose country to create control chart"),
+                                        label = h5("Choose location"),
                                         choices = sort(country_names),
                                         selected="United_States_of_America",
                                         width="100%"),
                                     
                                     #Numeric input for buffer
-                                    # Copy the line below to make a number input box into the UI.
-                                    numericInput("buffer", label = h4("Days beyond end of data series"), value = 10, min=1),
+                                    # 
+                                    numericInput("buffer", label = h5("Days beyond end of data series: extend curve and limits"), value = 10, min=1),
                                     
-                                    br(),
+                                    #br(),
                                     #Numeric input for baseline series length used to compute control limits
                                     #The default value should be chosen by code:  requires at least 8 days no more than 20
-                                    numericInput("baseline_n", label = h4("Days used to compute baseline"), value = 15, min = 8, max = 30),
+                                    numericInput("baseline_n", label = h5("Days used to compute limits"), value = 15, min = 8, max = 30),
                                     
-                                    br(),
+                                   #br(),
                                     #Input date that marks the start of the limit calculations
-                                    dateInput("start_date","Date:",value="2019-12-31"),
+                                    dateInput("start_date",label=h5("Start Date for calculations"),value="2019-12-31"),
+                                    helpText(h6("The starting date 2019-12-31 tells the app to use all the available data.")),
+                                    helpText(h6("You can choose a date after start of the series to focus the graph and calculations on a shorter date range.")),
                                     
                                     textAreaInput(
                                       inputId = 'chart_caption',
-                                      label   = h4('Add caption to chart:'),
+                                      label   = h5('Add caption to chart to comment on the data quality or implications'),
                                       value   = '',
-                                      width   = '100%')
+                                      width   = '100%'),
+                                   helpText(h6("Caption will be included in the downloaded image of the chart."))
                                     
                                 ),
                                 mainPanel(
