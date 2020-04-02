@@ -59,7 +59,7 @@ make_country_data <- function(data,country_name,buffer_days,baseline,start_date)
     df1_X_deaths <- df1_X_deaths[index:nrow(df1_X_deaths),]
   } else {
     #take only data records starting with deaths, don't allow prior dates
-    df1_X_deaths <- df1_X %>% filter(dateRep >= max(as.Date(start_date),as.Date(start_date0))) 
+    df1_X_deaths <- df1_X_deaths %>% filter(dateRep >= max(as.Date(start_date),as.Date(start_date0))) 
   } 
  
   #per Provost discussion, you can simply add 1 to deaths uniformly in the series.  
@@ -110,7 +110,7 @@ make_country_data <- function(data,country_name,buffer_days,baseline,start_date)
   if(!is.null(df_check)){
     check_predicted_value <- lm_out$coefficients[1]+ lm_out$coefficients[2]*df_check$serial_day
     
-    df_check_out <- cbind.data.frame(df_check[,c(1:3)],
+    df_check_out <- cbind.data.frame(df_check[,c(1,13,12)],
                                      rep(NA,nrow(df_check)),
                                      rep(NA,nrow(df_check)),
                                      check_predicted_value,
