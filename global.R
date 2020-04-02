@@ -10,7 +10,7 @@ library(DT)
 source("helper.R")
 
 #set local to FALSE if you want to read in the Open Data Table from the EOC
-local <- FALSE
+local <- TRUE
 
 data_file_country <- 'data/country_data.csv'
 data_file_state   <- 'data/us_state_data.csv'
@@ -29,5 +29,10 @@ df_country$dateRep <- as.Date(df_country$dateRep, format = '%d/%m/%Y')
 country_names <- unique(df_country$countriesAndTerritories)
 
 df_state <- read_csv(data_file_state)
-colnames(df_state) <- c('dateRep', 'countriesAndTerritories', 'fips', 'cases', 'deaths')
 state_names <- unique(df_state$state)
+#rename state variable to countriesAndTerritories to keep code consistent with nations data set
+colnames(df_state) <- c('dateRep', 'countriesAndTerritories', 'fips', 'cases', 'cum_deaths')
+#compute deaths in the state table, reported are cum deaths--have to work by state
+df_state <- df_state %>%group_by(countriesAndTerritories) %>% 
+              mutate(lag_cum_deaths=lag(cum_deaths)) %>% mutate(deaths= cum_deaths-lag_cum_deaths)
+
