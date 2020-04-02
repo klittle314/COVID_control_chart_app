@@ -37,10 +37,18 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
   dates_of_deaths <- df1_X$dateRep[which(df1_X$deaths>0)]
   start_date0 <- dates_of_deaths[1]
   
+  ##if 
   ##catch failure:  if data do not yield series with non zero deaths, then exit with message##
   
   df1_X_deaths <- df1_X %>% filter(dateRep >= start_date0)
- 
+  
+  #per Provost discussion, you can simply add 1 to deaths uniformly in the series.  
+  #KL note:  setting value to NA for a zero after an initial 8 non-zero values. Need to fix logic
+  #       e.g. Wisconsin has a string of deaths the embedded 0's in the series.  
+  #   Is the option to add 1 to all deaths or just to deaths with zero?
+  #df1_X_deaths$deaths_nudge <- unlist(lapply(df1_X_deaths$deaths,zero_NA))
+  #df1_X_deaths$deaths_nudge <- df1_X_deaths$deaths + 1
+  df1_X_deaths$deaths <- df1_X_deaths$deaths + 1
   
   if(start_date==as.Date("2019-12-31")){
   #if default 12/31/2019 start date, determine initial start to the series:  date of first death(s) 
@@ -64,8 +72,8 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
  
   #per Provost discussion, you can simply add 1 to deaths uniformly in the series.  
   #KL note:  setting value to NA for a zero after an initial 8 non-zero values.
-  df1_X_deaths$deaths_nudge <- unlist(lapply(df1_X_deaths$deaths,zero_NA))
-  #df1_X_deaths$deaths_nudge <- df1_X_deaths$deaths + 1
+  #df1_X_deaths$deaths_nudge <- unlist(lapply(df1_X_deaths$deaths,zero_NA))
+  df1_X_deaths$deaths_nudge <- df1_X_deaths$deaths # fix this 4/2/20....temp because I increment above
   
   df1_X_deaths$log_count_deaths <- log10(df1_X_deaths$deaths_nudge)
   df1_X_deaths$serial_day <- c(1:nrow(df1_X_deaths))
@@ -106,11 +114,12 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
   names(buffer_df) <- names(cchart_df)
   
   #fill out the data table if not all observations are used to compute the control limits
-  df_check <- df1_X_deaths[df1_X_deaths$serial_day > baseline,]
-  if(!is.null(df_check)){
+  if(max(df1_X_deaths$serial_day) > baseline){
+    df_check <- df1_X_deaths[df1_X_deaths$serial_day > baseline,]
+  
     check_predicted_value <- lm_out$coefficients[1]+ lm_out$coefficients[2]*df_check$serial_day
     
-    df_check_out <- cbind.data.frame(df_check[,c(1,13,12)],
+    df_check_out <- cbind.data.frame(df_check[,c("dateRep","serial_day","deaths")],
                                      rep(NA,nrow(df_check)),
                                      rep(NA,nrow(df_check)),
                                      check_predicted_value,
