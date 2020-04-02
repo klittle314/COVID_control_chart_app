@@ -119,7 +119,9 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     DT::dataTableOutput('data_table')
                                     ),
                                   tabPanel("Calculation Details",
-                                           h4("explanation goes here with parameters")
+                                           h4("explanation goes here with parameters"),
+                                           h6("linear fit parameters to log deaths"),
+                                           textOutput("parameters")
                                            
                                     )
                                   )
