@@ -31,9 +31,9 @@ index_test <- function(x,index,length_use=8){
   return(list(use_seq,index_use))
 }
 
-#function to subset master data set by country_name, start_date and pad by buffer_days
-make_country_data <- function(data,country_name,buffer_days,baseline,start_date){
-  df1_X <- data %>% filter(countriesAndTerritories == country_name) %>% arrange(dateRep)
+#function to subset master data set by location_name, start_date and pad by buffer_days
+make_location_data <- function(data,location_name,buffer_days,baseline,start_date){
+  df1_X <- data %>% filter(countriesAndTerritories == location_name) %>% arrange(dateRep)
   dates_of_deaths <- df1_X$dateRep[which(df1_X$deaths>0)]
   start_date0 <- dates_of_deaths[1]
   

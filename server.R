@@ -10,7 +10,7 @@ shinyServer(function(input, output, session) {
     print('sessionInfo():')
     print(sessionInfo())
     
-    data <- reactiveVal(value = df1)
+    df_upload <- reactiveVal(value = NULL)
 
     upload_data <- reactive({
         req(input$upload_data)
@@ -68,12 +68,7 @@ shinyServer(function(input, output, session) {
         
         data_add$dateRep <- as.Date(data_add$dateRep, format = '%m/%d/%Y')
         
-        data(dplyr::bind_rows(data(), data_add))
-        
-        updateSelectInput(
-            session = session,
-            inputId = 'choose_country',
-            choices = sort(unique(isolate(data()$countriesAndTerritories))))
+        df_upload(data_add)
         
         output$upload_confirm <- renderUI({
             list(
@@ -83,13 +78,49 @@ shinyServer(function(input, output, session) {
         })
     })
     
+    display_data <- reactive({
+        req(input$data_source)
+        
+        if (input$data_source == 'Country-level ECDC data')           df_country
+        else if (input$data_source == 'US state-level NY Times data') df_state
+        else if (input$data_source == 'User-uploaded data')           isolate(df_upload())
+    })
+    
+    observe({
+        req(display_data()) 
+        
+        selected <- isolate(input$choose_location)
+        choices  <- sort(unique(display_data()$countriesAndTerritories))
+        
+        if (!(selected %in% choices)) selected <- choices[1]
+        
+        updateSelectInput(
+            session = session,
+            inputId = 'choose_location',
+            choices = choices,
+            selected = selected)
+    })
+    
+    control_chart_caption <- reactive({
+        req(input$data_source)
+        
+        if (input$data_source == 'Country-level ECDC data')           data_source <- 'https://opendata.ecdc.europa.eu/covid19/casedistribution/csv'
+        else if (input$data_source == 'US state-level NY Times data') data_source <- 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv'
+        else if (input$data_source == 'User-uploaded data')           data_source <- 'User-uploaded data file'
+        
+        sprintf('%s\n\nSource: %s, %s',
+                input$chart_caption,
+                data_source,
+                as.character(Sys.Date()))
+    })
+    
     control_chart <- reactive({
-        country_use <- input$choose_country
+        location_use <- input$choose_location
         buffer <- input$buffer
         baseline1 <- input$baseline_n
         start_date1 <- input$start_date
-        list_use <- make_country_data(data=data(),
-                                      country_name=country_use,
+        list_use <- make_location_data(data=display_data(),
+                                      location_name=location_use,
                                       buffer_days=buffer,
                                       baseline=baseline1,
                                       start_date=start_date1)
@@ -97,23 +128,12 @@ shinyServer(function(input, output, session) {
         df_cchart <- list_use[[2]]
         lm_out <- list_use[[3]]
         
-        # #choose caption depending on source
-        # if(is.null(isolate(upload_message()))){
-        #     caption1 <- sprintf('%s\n\nSource: https://opendata.ecdc.europa.eu/covid19/casedistribution/csv, %s',
-        #                         input$chart_caption,
-        #                         as.character(Sys.Date()))
-        # } else caption1 <- paste0("My local file")
-        # 
-        caption1 <- sprintf('%s\n\nSource: https://opendata.ecdc.europa.eu/covid19/casedistribution/csv, %s',
-                            input$chart_caption,
-                            as.character(Sys.Date()))
-        
         p0 <- ggplot(data=data_use,aes(x=dateRep,y=deaths_nudge))+
             theme_bw()+
             geom_point(size=rel(3.0),colour="blue")+
             geom_line()+
-            labs(title=paste0(country_use," Daily New Deaths"), 
-                 caption = caption1) +
+            labs(title=paste0(location_use," Daily New Deaths"), 
+                 caption = control_chart_caption()) +
             xlab("Date")+
             ylab("Deaths per day")+
             xlim(min(data_use$dateRep),max(data_use$dateRep)+buffer)+
@@ -138,7 +158,7 @@ shinyServer(function(input, output, session) {
     
     output$download_chart <- downloadHandler(
         filename = function() {
-            sprintf('%s_%s_days.png', input$choose_country, input$baseline_n)
+            sprintf('%s_%s_days.png', input$choose_location, input$baseline_n)
         },
         content = function(file) {
             
