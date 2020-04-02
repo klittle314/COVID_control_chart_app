@@ -132,9 +132,11 @@ shinyServer(function(input, output, session) {
             theme_bw()+
             geom_point(size=rel(3.0),colour="blue")+
             geom_line()+
+
             labs(title=paste0(location_use," Daily New Deaths"), 
                  caption = control_chart_caption()) +
-            xlab("Date")+
+            xlab("")+
+
             ylab("Deaths per day")+
             xlim(min(data_use$dateRep),max(data_use$dateRep)+buffer)+
             theme(axis.text.x=element_text(size=rel(1.5)))+
@@ -148,12 +150,12 @@ shinyServer(function(input, output, session) {
             geom_line(data=df_cchart,aes(x=dateRep,y=UCL_anti_log),linetype="dotted")+
             geom_line(data=df_cchart,aes(x=dateRep,y=LCL_anti_log),linetype="dotted")
         
-        p3
+        return(list(p3,df_cchart))
         
     })
     
     output$control_chart <- renderPlot({
-        print(control_chart())
+        print(control_chart()[[1]])
     })
     
     output$download_chart <- downloadHandler(
@@ -167,4 +169,17 @@ shinyServer(function(input, output, session) {
             dev.off(which=dev.cur())
         }
     )
-})
+    
+    output$data_table <- DT::renderDataTable({
+        req(control_chart())
+        df_out <- control_chart()[[2]][,c(1,2,3,9,11,10)]
+        names(df_out) <- c("Date Reported","Serial Day","Deaths","Predicted Deaths","Lower Limit","Upper Limit")
+        df_out$Deaths <- 10^df_out$Deaths
+        df_out$'Predicted Deaths' <- round(df_out$'Predicted Deaths',0)
+        df_out$'Lower Limit' <- round(df_out$'Lower Limit',0)
+        df_out$'Upper Limit' <- round(df_out$'Upper Limit',0)
+        DT::datatable(df_out,
+                      rownames=FALSE)
+    })
+    
+ })

@@ -24,7 +24,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                 em(
                                     span("Created by "),
                                     a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
-                                    span("updated 1 April 2020"),
+                                    span("updated 2 April 2020"),
                                     br(), br()
                                 )
                             )
@@ -92,8 +92,8 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     #br(),
                                     #Numeric input for baseline series length used to compute control limits
                                     #The default value should be chosen by code:  requires at least 8 days no more than 20
-                                    numericInput("baseline_n", label = h5("Days used to compute limits"), value = 15, min = 8, max = 30),
-                                    
+                                    numericInput("baseline_n", label = h5("Maximum days used to compute limits"), value = 15, min = 8, max = 30),
+                                    helpText(h6("If there are fewer days in the data series than the maximum, app calculates using all the data.")),
                                    #br(),
                                     #Input date that marks the start of the limit calculations
                                     dateInput("start_date",label=h5("Start Date for calculations"),value="2019-12-31"),
@@ -109,11 +109,20 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     
                                 ),
                                 mainPanel(
-                                    plotOutput("control_chart",height="500px"),
+                                  tabsetPanel(id = 'display-tab',type='tabs',  
+                                    tabPanel("Basic Chart",
+                                              plotOutput("control_chart",height="500px"),
                                     
                                     downloadButton(outputId = 'download_chart',
-                                                   label = 'Download Chart')
+                                                   label = 'Download Chart'),
                                     
+                                    DT::dataTableOutput('data_table')
+                                    ),
+                                  tabPanel("Calculation Details",
+                                           h4("explanation goes here with parameters")
+                                           
+                                    )
+                                  )
                                 )
                             )
                    )
