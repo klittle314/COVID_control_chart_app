@@ -150,7 +150,7 @@ shinyServer(function(input, output, session) {
             geom_line(data=df_cchart,aes(x=dateRep,y=UCL_anti_log),linetype="dotted")+
             geom_line(data=df_cchart,aes(x=dateRep,y=LCL_anti_log),linetype="dotted")
         
-        return(list(p3,df_cchart))
+        return(list(p3,df_cchart,lm_out))
         
     })
     
@@ -180,6 +180,13 @@ shinyServer(function(input, output, session) {
         df_out$'Upper Limit' <- round(df_out$'Upper Limit',0)
         DT::datatable(df_out,
                       rownames=FALSE)
+    })
+    
+    #add parameters to the calculations page
+    output$parameters <- renderPrint({
+        req(control_chart())
+        intercept <- control_chart()[[3]][[1]][1]
+        print(intercept)
     })
     
  })
