@@ -12,15 +12,22 @@ source("helper.R")
 #set local to FALSE if you want to read in the Open Data Table from the EOC
 local <- FALSE
 
-data_file <- 'data/ecdc_data.csv'
+data_file_country <- 'data/country_data.csv'
+data_file_state   <- 'data/us_state_data.csv'
 
 if (!local) {
   covid_data <- httr::GET("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv", 
                           authenticate(":", ":", type="ntlm"),
-                          write_disk(data_file,overwrite=TRUE))
+                          write_disk(data_file_country, overwrite=TRUE))
+  
+  download.file(url = 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv',
+                destfile = data_file_state)
 }
 
-df1 <- read_csv(data_file)
-df1$dateRep <- as.Date(df1$dateRep, format = '%d/%m/%Y')
+df_country <- read_csv(data_file_country)
+df_country$dateRep <- as.Date(df_country$dateRep, format = '%d/%m/%Y')
+country_names <- unique(df_country$countriesAndTerritories)
 
-country_names <- unique(df1$countriesAndTerritories)
+df_state <- read_csv(data_file_state)
+colnames(df_state) <- c('dateRep', 'countriesAndTerritories', 'fips', 'cases', 'deaths')
+state_names <- unique(df_state$state)
