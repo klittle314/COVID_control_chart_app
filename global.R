@@ -9,7 +9,7 @@ library(httr)
 library(DT)
 source("helper.R")
 
-#set local to FALSE if you want to read in the Open Data Table from the EOC
+#set local to FALSE if you want to read in the Open Data Table from the EOC and state data from NYT
 local <- TRUE
 
 data_file_country <- 'data/country_data.csv'
