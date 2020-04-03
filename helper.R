@@ -50,13 +50,16 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
   #df1_X_deaths$deaths_nudge <- df1_X_deaths$deaths + 1
   df1_X_deaths$deaths <- df1_X_deaths$deaths + 1
   
-  if(start_date==as.Date("2019-12-31")){
+  #series_length:  number of sequential records used to find the start point
+  series_length=8
+  
+  if(start_date==as.Date("2019-12-31") && nrow(df1_X_deaths) > series_length){
   #if default 12/31/2019 start date, determine initial start to the series:  date of first death(s) 
   #find starting index of the series that has length_use=8 death values greater than 0
     i <- 1
     index_fail = TRUE
     while(index_fail) {
-      index_check <- index_test(df1_X_deaths$deaths,i,length_use=8)
+      index_check <- index_test(df1_X_deaths$deaths,i,length_use=series_length)
       if(index_check[[1]]) {
         index <- index_check[[2]]
         index_fail <- FALSE
@@ -133,6 +136,9 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
   df_cchart$UCL_anti_log <- 10^df_cchart$UCL
   df_cchart$LCL_anti_log <- 10^df_cchart$LCL
   
+  #df1_X_deaths is the dataframe with observed deaths, possibly truncated by user selection of Start Date for calculations
+  #df_cchart is the dataframe that has observations and additional 'buffer' days, contains predicted values and limit values
+  #lm_out is the linear model fitted to the log(deaths_nudge).
   results_list <- list(df1_X_deaths,df_cchart,lm_out)
   
 }
