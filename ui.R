@@ -121,7 +121,8 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                   tabPanel("Calculation Details",
                                            h4("explanation goes here with parameters"),
                                            h6("linear fit parameters to log deaths"),
-                                           textOutput("parameters")
+                                           textOutput("parameters"),
+                                           plotOutput("log_control_chart",height="300px")
                                            
                                     )
                                   )
