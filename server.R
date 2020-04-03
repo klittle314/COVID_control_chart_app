@@ -212,10 +212,9 @@ shinyServer(function(input, output, session) {
     output$data_table <- DT::renderDataTable({
         req(make_data())
        #df_out <- make_data()[[2]][,c(1,2,3,9,11,10)]
-        df_out <- make_data()[[2]][,c("dateRep","serial_day","log_count_deaths",
+        df_out <- make_data()[[2]][,c("dateRep","serial_day","deaths",
                                       "predict","LCL_anti_log","UCL_anti_log")]
         names(df_out) <- c("Date Reported","Serial Day","Deaths","Predicted Deaths","Lower Limit","Upper Limit")
-        df_out$Deaths <- 10^df_out$Deaths
         df_out$'Predicted Deaths' <- round(df_out$'Predicted Deaths',0)
         df_out$'Lower Limit' <- round(df_out$'Lower Limit',0)
         df_out$'Upper Limit' <- round(df_out$'Upper Limit',0)
