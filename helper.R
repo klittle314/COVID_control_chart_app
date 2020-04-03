@@ -92,7 +92,7 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
   
   #should handle the break in the series more elegantly if we use the 'replace embedded 0 with NA" rule
   
-  cchart_df <- data.frame(data_use_cc[!is.na(data_use_cc$log_count_deaths),c("dateRep","serial_day","log_count_deaths")],
+  cchart_df <- data.frame(data_use_cc[!is.na(data_use_cc$log_count_deaths),c("dateRep","serial_day","deaths","log_count_deaths")],
                           lm_out$residuals,c(NA,diff(lm_out$residuals)),lm_out$fitted.values)
   names(cchart_df)[5] <- "differences"
   
@@ -110,6 +110,7 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
                                 rep(NA,buffer),
                                 rep(NA,buffer),
                                 rep(NA,buffer),
+                                rep(NA,buffer),
                                 predicted_value,
                                 predicted_value + 2.66*AvgMR,
                                 predicted_value - 2.66*AvgMR)
@@ -123,6 +124,7 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
     check_predicted_value <- lm_out$coefficients[1]+ lm_out$coefficients[2]*df_check$serial_day
     
     df_check_out <- cbind.data.frame(df_check[,c("dateRep","serial_day","deaths")],
+                                     rep(NA,nrow(df_check)),
                                      rep(NA,nrow(df_check)),
                                      rep(NA,nrow(df_check)),
                                      check_predicted_value,
