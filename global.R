@@ -10,10 +10,13 @@ library(DT)
 source("helper.R")
 
 #set local to FALSE if you want to read in the Open Data Table from the EOC
-local <- FALSE
+local <- TRUE
 
 data_file_country <- 'data/country_data.csv'
 data_file_state   <- 'data/us_state_data.csv'
+defStartdate <- NA
+defBuffer <- 10
+defBaseline <- 15
 
 if (!local) {
   covid_data <- httr::GET("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv", 
