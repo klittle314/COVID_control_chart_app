@@ -93,7 +93,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     #br(),
                                     #Numeric input for baseline series length used to compute control limits
                                     #The default value should be chosen by code:  requires at least 8 days no more than 20
-                                    numericInput("baseline_n", label = h5("Maximum days used to compute limits"), value = defBaseline, min = 8, max = 30),
+                                    numericInput("baseline_n", label = h5("Maximum days used to compute limits"), value = defBaseline, min = 8),
                                     helpText(h6("If there are fewer days in the data series than the maximum, app calculates using all the data.")),
                                    #br(),
                                     #Input date that marks the start of the limit calculations
