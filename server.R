@@ -78,6 +78,17 @@ shinyServer(function(input, output, session) {
         })
     })
     
+    observeEvent(input$reset, {
+      updateDateInput(session, "start_date",
+                        value = defStartdate)
+      
+      updateNumericInput(session, "buffer",
+                        value = defBuffer)
+      
+      updateNumericInput(session, "baseline_n",
+                        value = defBaseline)
+    })
+    
     display_data <- reactive({
         req(input$data_source)
         

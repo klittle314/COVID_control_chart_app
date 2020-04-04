@@ -42,6 +42,7 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
   
   df1_X_deaths <- df1_X %>% filter(dateRep >= start_date0)
   
+
   #per Provost discussion, you can simply add 1 to deaths uniformly in the series.  
   #KL note:  setting value to NA for a zero after an initial 8 non-zero values. Need to fix logic
   #       e.g. Wisconsin has a string of deaths the embedded 0's in the series.  
@@ -53,9 +54,11 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
   #series_length:  number of sequential records used to find the start point
   series_length=8
   
-  if(start_date==as.Date("2019-12-31") && nrow(df1_X_deaths) > series_length){
+  if((length(start_date)==0) && nrow(df1_X_deaths) > series_length){
   #if default 12/31/2019 start date, determine initial start to the series:  date of first death(s) 
+
   #find starting index of the series that has length_use=8 death values greater than 0
+  #These needs some error handling
     i <- 1
     index_fail = TRUE
     while(index_fail) {
@@ -68,6 +71,7 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
     
     #subset the data file so it starts with the sequence of 8 non-negative deaths
     df1_X_deaths <- df1_X_deaths[index:nrow(df1_X_deaths),]
+
   } else {
     #take only data records starting with deaths, don't allow prior dates
     df1_X_deaths <- df1_X_deaths %>% filter(dateRep >= max(as.Date(start_date),as.Date(start_date0))) 

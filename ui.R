@@ -88,19 +88,22 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     
                                     #Numeric input for buffer
                                     # 
-                                    numericInput("buffer", label = h5("Days beyond end of data series: extend curve and limits"), value = 10, min=1),
+                                    numericInput("buffer", label = h5("Days beyond end of data series: extend curve and limits"), value = defBuffer, min=1),
                                     
                                     #br(),
                                     #Numeric input for baseline series length used to compute control limits
                                     #The default value should be chosen by code:  requires at least 8 days no more than 20
-                                    numericInput("baseline_n", label = h5("Maximum days used to compute limits"), value = 15, min = 8, max = 30),
+                                    numericInput("baseline_n", label = h5("Maximum days used to compute limits"), value = defBaseline, min = 8, max = 30),
                                     helpText(h6("If there are fewer days in the data series than the maximum, app calculates using all the data.")),
                                    #br(),
                                     #Input date that marks the start of the limit calculations
-                                    dateInput("start_date",label=h5("Start Date for calculations"),value="2019-12-31"),
-                                    helpText(h6("The starting date 2019-12-31 tells the app to use all the available data.")),
+                                    dateInput("start_date",label=h5("Custom Start Date for calculations"),value=defStartdate),
+                                    helpText(h6("Leave blank to allow the start date to be calculated")),
+                                    #helpText(h6("The starting date 2019-12-31 tells the app to use all the available data.")),
                                     helpText(h6("You can choose a date after start of the series to focus the graph and calculations on a shorter date range.")),
-                                    
+                                   
+                                   actionButton("reset", "Reset Defaults"),
+                                   
                                     textAreaInput(
                                       inputId = 'chart_caption',
                                       label   = h5('Add caption to chart to comment on the data quality or implications'),
