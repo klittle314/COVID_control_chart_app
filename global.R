@@ -29,6 +29,7 @@ df_country$dateRep <- as.Date(df_country$dateRep, format = '%d/%m/%Y')
 country_names <- unique(df_country$countriesAndTerritories)
 
 df_state <- read_csv(data_file_state)
+#problems opening the NYT connection 4/4/2020.  Also, native date format is %Y-%m-%d  Manual file manip changes date format.
 df_state$date <- as.Date(df_state$date,format='%m/%d/%Y')
 state_names <- unique(df_state$state)
 #rename state variable to countriesAndTerritories to keep code consistent with nations data set
