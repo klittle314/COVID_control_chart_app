@@ -96,6 +96,15 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     numericInput("baseline_n", label = h5("Maximum days used to compute limits"), value = defBaseline, min = 8),
                                     helpText(h6("If there are fewer days in the data series than the maximum, app calculates using all the data.")),
                                    #br(),
+                                    
+                                    # Checkbox that if checked, constrains control chart y-axis to the range of observed death counts, instead of the 
+                                    # range of the projections. Helps view data series for countries with enough data that projections dominate
+                                    # the observed series.
+                                    checkboxInput(
+                                      inputId = 'constrain_y_axis',
+                                      label   = h5('Constrain y-axis limits to observed data (instead of projections)'),
+                                      value   = FALSE),
+                                    
                                     #Input date that marks the start of the limit calculations
                                     dateInput("start_date",label=h5("Custom Start Date for calculations"),value=defStartdate),
                                     helpText(h6("Leave blank to allow the start date to be calculated")),
@@ -116,9 +125,11 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                   tabsetPanel(id = 'display-tab',type='tabs',  
                                     tabPanel("Basic Chart",
                                               plotOutput("control_chart",height="500px"),
-                                    
+                                             
                                     downloadButton(outputId = 'download_chart',
                                                    label = 'Download Chart'),
+                                    
+                                    tags$hr(),
                                     
                                     DT::dataTableOutput('data_table')
                                     ),
