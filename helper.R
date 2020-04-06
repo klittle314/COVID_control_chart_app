@@ -100,7 +100,7 @@ find_start_date <- function(data,location_name,start_date=NA){
 #function to subset master data set by location_name, start_date and pad by buffer_days
 make_location_data <- function(data,location_name,buffer_days,baseline,start_date){
   
-  start_info <- find_start_date
+  #start_info <- find_start_date(data,location_name,start_date)
   
   df1_X <- data %>% filter(countriesAndTerritories == location_name) %>% arrange(dateRep)
   dates_of_deaths <- df1_X$dateRep[which(df1_X$deaths>0)]
