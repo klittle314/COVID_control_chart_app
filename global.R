@@ -9,22 +9,20 @@ library(httr)
 library(DT)
 source("helper.R")
 
+data_file_country <- paste0('data/country_data_', as.character(Sys.Date()), '.csv')
+data_file_state   <- paste0('data/us_state_data_', as.character(Sys.Date()), '.csv')
 
-#set local to FALSE if you want to read in the Open Data Table from the EOC and state data from NYT
-
-local <- TRUE
-
-data_file_country <- 'data/country_data.csv'
-data_file_state   <- 'data/us_state_data.csv'
 defStartdate <- NA
 defBuffer <- 10
 defBaseline <- 15
 
-if (!local) {
+if (!file.exists(data_file_country)) {
   covid_data <- httr::GET("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv", 
                           authenticate(":", ":", type="ntlm"),
                           write_disk(data_file_country, overwrite=TRUE))
-  
+}
+
+if (!file.exists(data_file_state)) {
   download.file(url = 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv',
                 destfile = data_file_state)
 }

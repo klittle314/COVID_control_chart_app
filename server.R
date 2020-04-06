@@ -185,8 +185,12 @@ shinyServer(function(input, output, session) {
                 geom_line(data=df_cchart1,aes(x=dateRep,y=lm_out.fitted.values))+
                 geom_line(data=df_cchart1,aes(x=dateRep,y=UCL),linetype="dotted")+
                 geom_line(data=df_cchart1,aes(x=dateRep,y=LCL),linetype="dotted")
-                
-                
+
+        if (input$constrain_y_axis) {
+            p3 <- p3 + scale_y_continuous(
+                limits = c(0, max(data_use$deaths_nudge, na.rm = TRUE))
+            )
+        }   
         
         return(list(p0,p3,p_log))
         
