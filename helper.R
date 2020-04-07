@@ -89,11 +89,15 @@ find_start_date <- function(data,location_name,start_date=NA){
     start_date0 <- NA
     start_date1 <- NA
   }
+
   #forcing the dates to be date objects else may be interpreted as integer if values are NA
   # df_out <- cbind.data.frame(as.Date(start_date0),as.Date(start_date1),Rule_shift)
   # names(df_out) <- c("Date_of_first_death","date_of_c-chart_signal","shift_rule_signal")
   # return(df_out)
-  dates_out <- c(start_date0,start_date1)
+  list(
+    first_death = start_date0,
+    c_chart_signal = start_date1,
+    shift_rule_signal = Rule_shift)
 }
 
 
@@ -104,6 +108,64 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
   
   df1_X <- data %>% filter(countriesAndTerritories == location_name) %>% arrange(dateRep)
   dates_of_deaths <- df1_X$dateRep[which(df1_X$deaths>0)]
+  
+  date_cutoffs <- find_start_date(data = df1_X, location_name = location_name, start_date = start_date)
+      
+  data_stages <- list()
+  
+  # if date_cutoffs$first_death is NA (no deaths), stage1 is the whole data.frame df1_X
+  if (is.na(date_cutoffs$first_death)) stage1 <- df1_X
+  else stage1 <- df1_X %>% filter(dateRep < date_cutoffs$first_death)
+  
+  stage1$stage <- 'Pre-deaths'
+  data_stages$stage1 <- stage1
+  
+  # If there has been a death, stage 2 is df1_X starting on the day of the first death,
+  # and must be at least 8 days
+  if (!is.na(date_cutoffs$first_death)) {
+    stage2 <- df1_X %>% filter(dateRep >= date_cutoffs$first_death)
+    
+    # Must be at least 8 records long
+    if (nrow(stage2) >= 8) {
+      
+      # If c_chart_signal is observed, cut off stage2 before that date.
+      if (!is.na(date_cutoffs$c_chart_signal)) {
+        stage2 <- stage2 %>% filter(dateRep < date_cutoffs$c_chart_signal)
+      }
+      
+      stage2$stage <- 'Deaths observed, pre-c-chart'
+      
+      data_stages$stage2 <- stage2
+    }
+  }
+  
+  # If there has been a c-chart signal observed, stage 3 begins with that date and is at 
+  # least 8 subsequent days, up to 20 (determined by value of baseline argument).
+  if (!is.na(date_cutoffs$c_chart_signal)) {
+    stage3 <- df1_X %>% filter(dateRep >= date_cutoffs$c_chart_signal)
+    
+    if (nrow(stage3) >= 8) {
+      
+      stage3 <- head(stage3, baseline)
+    
+      stage3$stage <- 'C-chart signal'
+    
+      data_stages$stage3 <- stage3
+    }
+  }
+  
+  # If there has been a c-chart signal observed, and there's data after the c-chart signal
+  # start plus baseline period, make that stage 4
+  if (!is.na(date_cutoffs$c_chart_signal)) {
+    stage4 <- df1_X %>% filter(dateRep >= date_cutoffs$c_chart_signal + baseline)
+    
+    stage4$stage <- 'Remainder'
+    
+    data_stages$stage4 <- stage4
+  }
+  
+  df1_X <- dplyr::bind_rows(data_stages)
+  
   start_date0 <- dates_of_deaths[1]
   
   ##if 
