@@ -39,6 +39,7 @@ find_start_date <- function(data,location_name,start_date=NA){
   df1_X <- data %>% filter(countriesAndTerritories == location_name) %>% arrange(dateRep)
   Rule_shift <- NA  
   #bound the length of the calculations, no more than cc_length records used to compute center line and upper limit
+  #note that this parameter is NOT the same as the baseline parameter chosen by the user
   cc_length <- 20
   if(any(df1_X$deaths >0,na.rm=TRUE)) {
     dates_of_deaths <- df1_X$dateRep[which(df1_X$deaths>0)]
@@ -104,10 +105,9 @@ find_start_date <- function(data,location_name,start_date=NA){
 #function to subset master data set by location_name, start_date and pad by buffer_days
 make_location_data <- function(data,location_name,buffer_days,baseline,start_date){
   
-  #start_info <- find_start_date(data,location_name,start_date)
   
   df1_X <- data %>% filter(countriesAndTerritories == location_name) %>% arrange(dateRep)
-  dates_of_deaths <- df1_X$dateRep[which(df1_X$deaths>0)]
+  #dates_of_deaths <- df1_X$dateRep[which(df1_X$deaths>0)]
   
   date_cutoffs <- find_start_date(data = df1_X, location_name = location_name, start_date = start_date)
       
@@ -142,7 +142,7 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
   # If there has been a c-chart signal observed, stage 3 begins with that date and is at 
   # least 8 subsequent days, up to 20 (determined by value of baseline argument).
   if (!is.na(date_cutoffs$c_chart_signal)) {
-    stage3 <- df1_X %>% filter(dateRep >= date_cutoffs$c_chart_signal)
+    stage3 <- df1_X %>% filter(dateRep >= date_cutoffs$c_chart_signal) 
     
     if (nrow(stage3) >= 8) {
       
@@ -159,14 +159,16 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
   if (!is.na(date_cutoffs$c_chart_signal)) {
     stage4 <- df1_X %>% filter(dateRep >= date_cutoffs$c_chart_signal + baseline)
     
-    stage4$stage <- 'Remainder'
+    if(nrow(stage4)> 0) {
+        stage4$stage <- 'Remainder'
     
-    data_stages$stage4 <- stage4
+        data_stages$stage4 <- stage4
+    }
   }
   
   df1_X <- dplyr::bind_rows(data_stages)
   
-  start_date0 <- dates_of_deaths[1]
+  #start_date0 <- dates_of_deaths[1]
   
   ##if 
   ##catch failure:  if data do not yield series with non zero deaths, then exit with message##
