@@ -137,7 +137,7 @@ shinyServer(function(input, output, session) {
                                        buffer_days=buffer,
                                        baseline=baseline1,
                                        start_date=start_date1)
-        
+        browser()
         return(list_use)
     })
     
