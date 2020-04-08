@@ -80,42 +80,40 @@ find_start_date <- function(data,location_name,start_date=NA){
           i <- i+1
         } else {
           start_date1 <- NA
+          CL <- NA
+          C_UCL <- NA
           stop <- TRUE
         }
       }
       
-    } else start_date1 <- NA
+    } else {
+      start_date1 <- NA
+      CL <- NA
+      C_UCL <- NA
     
   } else {
     start_date0 <- NA
     start_date1 <- NA
+    CL <- NA
+    C_UCL <- NA
   }
 
-  #forcing the dates to be date objects else may be interpreted as integer if values are NA
-  # df_out <- cbind.data.frame(as.Date(start_date0),as.Date(start_date1),Rule_shift)
-  # names(df_out) <- c("Date_of_first_death","date_of_c-chart_signal","shift_rule_signal")
-  # return(df_out)
+  #pass the key dates and C-chart information
   list(
     first_death = start_date0,
     c_chart_signal = start_date1,
-    shift_rule_signal = Rule_shift)
+    CL_out = CL,
+    C_UCL_out = C_UCL)
+ }
 }
 
-
-#function to subset master data set by location_name, start_date and pad by buffer_days
-make_location_data <- function(data,location_name,buffer_days,baseline,start_date){
-  
-  
-  df1_X <- data %>% filter(countriesAndTerritories == location_name) %>% arrange(dateRep)
-  #dates_of_deaths <- df1_X$dateRep[which(df1_X$deaths>0)]
-  
-  date_cutoffs <- find_start_date(data = df1_X, location_name = location_name, start_date = start_date)
-      
+#new function to label stages, MDEC created 4-7-2020
+create_stages <- function(data1,date_cutoffs){
   data_stages <- list()
   
   # if date_cutoffs$first_death is NA (no deaths), stage1 is the whole data.frame df1_X
-  if (is.na(date_cutoffs$first_death)) stage1 <- df1_X
-  else stage1 <- df1_X %>% filter(dateRep < date_cutoffs$first_death)
+  if (is.na(date_cutoffs$first_death)) stage1 <- data1
+  else stage1 <- data1 %>% filter(dateRep < date_cutoffs$first_death)
   
   stage1$stage <- 'Pre-deaths'
   data_stages$stage1 <- stage1
@@ -123,7 +121,7 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
   # If there has been a death, stage 2 is df1_X starting on the day of the first death,
   # and must be at least 8 days
   if (!is.na(date_cutoffs$first_death)) {
-    stage2 <- df1_X %>% filter(dateRep >= date_cutoffs$first_death)
+    stage2 <- data1 %>% filter(dateRep >= date_cutoffs$first_death)
     
     # Must be at least 8 records long
     if (nrow(stage2) >= 8) {
@@ -133,7 +131,7 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
         stage2 <- stage2 %>% filter(dateRep < date_cutoffs$c_chart_signal)
       }
       
-      stage2$stage <- 'Deaths observed, pre-c-chart'
+      stage2$stage <- 'Deaths observed before c-chart signal'
       
       data_stages$stage2 <- stage2
     }
@@ -142,14 +140,14 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
   # If there has been a c-chart signal observed, stage 3 begins with that date and is at 
   # least 8 subsequent days, up to 20 (determined by value of baseline argument).
   if (!is.na(date_cutoffs$c_chart_signal)) {
-    stage3 <- df1_X %>% filter(dateRep >= date_cutoffs$c_chart_signal) 
+    stage3 <- data1 %>% filter(dateRep >= date_cutoffs$c_chart_signal) 
     
     if (nrow(stage3) >= 8) {
       
       stage3 <- head(stage3, baseline)
-    
-      stage3$stage <- 'C-chart signal'
-    
+      
+      stage3$stage <- 'Exponential growth and fit'
+      
       data_stages$stage3 <- stage3
     }
   }
@@ -157,129 +155,229 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
   # If there has been a c-chart signal observed, and there's data after the c-chart signal
   # start plus baseline period, make that stage 4
   if (!is.na(date_cutoffs$c_chart_signal)) {
-    stage4 <- df1_X %>% filter(dateRep >= date_cutoffs$c_chart_signal + baseline)
+    stage4 <- data1 %>% filter(dateRep >= date_cutoffs$c_chart_signal + baseline)
     
     if(nrow(stage4)> 0) {
-        stage4$stage <- 'Remainder'
-    
-        data_stages$stage4 <- stage4
+      stage4$stage <- 'Observations after exponential limits established'
+      
+      data_stages$stage4 <- stage4
     }
   }
   
-  df1_X <- dplyr::bind_rows(data_stages)
-  
-  #start_date0 <- dates_of_deaths[1]
-  
-  ##if 
-  ##catch failure:  if data do not yield series with non zero deaths, then exit with message##
-  
-  df1_X_deaths <- df1_X %>% filter(dateRep >= start_date0)
-  
+  data_out <- dplyr::bind_rows(data_stages)
+}
 
-  #per Provost discussion, you can simply add 1 to deaths uniformly in the series.  
-  #KL note:  setting value to NA for a zero after an initial 8 non-zero values. Need to fix logic
-  #       e.g. Wisconsin has a string of deaths the embedded 0's in the series.  
-  #   Is the option to add 1 to all deaths or just to deaths with zero?
-  #df1_X_deaths$deaths_nudge <- unlist(lapply(df1_X_deaths$deaths,zero_NA))
-  #df1_X_deaths$deaths_nudge <- df1_X_deaths$deaths + 1
-  df1_X_deaths$deaths <- df1_X_deaths$deaths + 1
+
+#function to subset master data set by location_name, start_date and pad by buffer_days
+make_location_data <- function(data,location_name,buffer_days,baseline,start_date){
+  
+  #create an object that will have data frames, dates of stages and the linear model fit
+  data_results_list <- list()
+    
+  #initialize two list entries that are conditionally calculated by the rest of the function
+    data_results_list$df_exp_fit <- NULL
+    data_results_list$lm_out <- NULL
+    
+  
+  df1_X <- data %>% filter(countriesAndTerritories == location_name) %>% arrange(dateRep)
+  #dates_of_deaths <- df1_X$dateRep[which(df1_X$deaths>0)]
+  
+  date_cutoffs <- find_start_date(data = df1_X, location_name = location_name, start_date = start_date)
+  
+  data_results_list$date_cutoffs <- date_cutoffs
+   
+  df1_X <- create_stages(data=df1_X,date_cutoffs=date_cutoffs)
+  
+  df1_X$deaths_nudge <- df1_X$deaths
+  
+  data_results_list$df1_X <- df1_X
+  
+  #if there are data in stage 2, then we will plot those data in run chart if <= 8 records and no control chart signal
+  #if there are data in stage 3, we need to calculate the information
+  #check if any embedded zeros in stage 3:  we will convert zero to NA on supposition that a zero in this phase represents missing data
+  #create a new variable deaths_nudge to represent the adjusted death series
+  ################# Allow over-ride of the calculated start_date by the user chosen start_date.#################
+  exp_fit_min_length <- 8
+  
+  
+  
+  #Build the linear model of there are sufficient records and calculate the anti logs of prediction and limits
+   if(!is.na(date_cutoffs$c_chart_signal) )  { 
+      df1_X_exp_fit <- df1_X %>% filter(stage=='Exponential growth and fit')
+      
+      #check for sufficient stage 3 values to calculate the exponential growth control limits
+      
+      if(nrow(df1_X_exp_fit)> exp_fit_min_length) {
+            #replace any deaths_nudge value = 0 with NA
+            df1_X_exp_fit$deaths_nudge <- unlist(lapply(df1_X_exp_fit$deaths_nudge,zero_NA))
+            
+            df1_X_exp_fit$log_10_deaths <- log10(df1_X_exp_fit$deaths_nudge)
+            
+            df1_X_exp_fit$serial_day <- c(1:nrow(df1_X_exp_fit))
+            
+            #allow the use of a different baseline, user defined input
+            df1_X_exp_fit <- df1_X_exp_fit %>% filter(serial_day <= baseline)
+            
+            lm_out <- lm(data=df1_X_exp_fit,df1_X_exp_fit$log_10_deaths ~ df1_X_exp_fit$serial_day)
+            
+            data_results_list$lm_out <- lm_out
+            
+            #should make a prediction for the NA values-- find the value and insert
+            cchart_df <- data.frame(df1_X_exp_fit[!is.na(df1_X_exp_fit$log_10_deaths),c("dateRep","serial_day","deaths","log_10_deaths")],
+                                    lm_out$residuals,c(NA,diff(lm_out$residuals)),lm_out$fitted.values)
+            
+            names(cchart_df)[5] <- "differences"
+            
+            AvgMR <- mean(abs(cchart_df$differences),na.rm=TRUE)
+            
+            cchart_df$UCL <- lm_out$fitted.values + 2.66*AvgMR
+            
+            cchart_df$LCL <- lm_out$fitted.values - 2.66*AvgMR
+            
+            df_exp_fit <- cchart_df
+            
+            
+          #check for any values in stage 4; compute them
+          
+          if(any(df1_X$stage=='Observations after exponential limits established')) {
+             df1_X_post_fit <- df1_X %>% filter(stage=='Observations after exponential limits established')
+             
+             nrow(df1_X_post_fit) <- nrow_post_fit
+             
+             df1_X_post_fit$serial_day <- c((max(df1_X_exp_fit$serial_day)+1):nrows_post_fit)
+             
+             check_predicted_value <- lm_out$coefficients[1]+ lm_out$coefficients[2]*df1_X_post_fit$serial_day
+             
+             df_post_fit_out <- cbind.data.frame(df1_X_post_fit[,c("dateRep","serial_day","deaths")],
+                                              rep(NA,nrows_post_fit),
+                                              rep(NA,nrows_post_fit),
+                                              rep(NA,nrows_post_fit),
+                                              check_predicted_value,
+                                              check_predicted_value + 2.66*AvgMR,
+                                              check_predicted_value - 2.66*AvgMR)
+             
+             names(df_post_fit_out) <- names(df_exp_fit)
+             
+             df_exp_fit <- rbind.data.frame(df_exp_fit,df_post_fit_out)
+            }
+          #now add the buffer
+            #buffer with buffer days beyond max date
+            serial_day_buffer_start <- nrow(df1_X)
+            
+            buffer_dates <- seq.Date(from=max(df1_X$dateRep)+1,to=max(df1_X$dateRep)+buffer_days,by="day")
+            
+            buffer_serial_day <- seq(from=serial_day_buffer_start+1,to=serial_day_buffer_start+buffer_days,by=1)
+            
+            predicted_value <- lm_out$coefficients[1]+ lm_out$coefficients[2]*buffer_serial_day
+            
+            buffer_dates <- seq.Date(from=max(df1_X$dateRep)+1,to=max(df1_X$dateRep)+buffer_days,by="day")
+            
+            buffer_df <- cbind.data.frame(buffer_dates,
+                                          buffer_serial_day,
+                                          rep(NA,buffer_days),
+                                          rep(NA,buffer_days),
+                                          rep(NA,buffer_days),
+                                          rep(NA,buffer_days),
+                                          predicted_value,
+                                          predicted_value + 2.66*AvgMR,
+                                          predicted_value - 2.66*AvgMR)
+            
+            names(buffer_df) <- names(df_exp_fit)
+            
+            df_exp_fit <- rbind.data.frame(df_exp_fit,buffer_df)
+            
+            df_exp_fit$predict <- 10^df_exp_fit$lm_out.fitted.values
+            
+            df_exp_fit$UCL_anti_log <- 10^df_exp_fit$UCL
+            
+            df_exp_fit$LCL_anti_log <- 10^df_exp_fit$LCL
+            
+            data_results_list$df_exp_fit <- df_exp_fit
+      }
+      
+      
+   }  
+ 
+  
+   #make conditional:   output is df_X1, date_cutoffs, AND lm_out could be NULL and df_exp_fit could be NULL
+  return(data_results_list)
+}
+ ############end of new function 
+  
+  
+  
   
   #series_length:  number of sequential records used to find the start point
-  series_length=8
+  # series_length=8
+  # 
+  # 
+  # 
+  # df1_X_deaths$log_count_deaths <- log10(df1_X_deaths$deaths_nudge)
+  # df1_X_deaths$serial_day <- c(1:nrow(df1_X_deaths))
+  # 
+  # 
+  # data_use_cc <- df1_X_deaths[df1_X_deaths$serial_day <= baseline,]
+  # buffer <- buffer_days
+  # 
+  # #create linear model
+  # #now compute the linear regression for the log10 counts 
+  # #lm_out <- lm(data=data_use_cc,log_count_deaths ~ serial_day)
+  # lm_out <- lm(data=data_use_cc,data_use_cc$log_count_deaths ~ data_use_cc$serial_day)
+  # 
+  # #should handle the break in the series more elegantly if we use the 'replace embedded 0 with NA" rule
+  # 
+  # cchart_df <- data.frame(data_use_cc[!is.na(data_use_cc$log_10_deaths),c("dateRep","serial_day","deaths","log_count_deaths")],
+  #                         lm_out$residuals,c(NA,diff(lm_out$residuals)),lm_out$fitted.values)
+  # names(cchart_df)[5] <- "differences"
+  # 
+  # AvgMR <- mean(abs(cchart_df$differences),na.rm=TRUE)
+  # cchart_df$UCL <- lm_out$fitted.values + 2.66*AvgMR
+  # cchart_df$LCL <- lm_out$fitted.values - 2.66*AvgMR
+  # 
+  # 
+  # #buffer with buffer days beyond max date
+  # buffer_serial_day <- seq(from=max(df1_X_deaths$serial_day)+1,to=max(df1_X_deaths$serial_day)+buffer,by=1)
+  # predicted_value <- lm_out$coefficients[1]+ lm_out$coefficients[2]*buffer_serial_day
+  # buffer_dates <- seq.Date(from=max(df1_X_deaths$dateRep)+1,to=max(df1_X_deaths$dateRep)+buffer,by="day")
+  # buffer_df <- cbind.data.frame(buffer_dates,
+  #                               buffer_serial_day,
+  #                               rep(NA,buffer),
+  #                               rep(NA,buffer),
+  #                               rep(NA,buffer),
+  #                               rep(NA,buffer),
+  #                               predicted_value,
+  #                               predicted_value + 2.66*AvgMR,
+  #                               predicted_value - 2.66*AvgMR)
+  # 
+  # names(buffer_df) <- names(cchart_df)
+  # 
+  # #fill out the data table if not all observations are used to compute the control limits
+  # if(max(df1_X_deaths$serial_day) > baseline){
+  #   df_check <- df1_X_deaths[df1_X_deaths$serial_day > baseline,]
+  # 
+  #   check_predicted_value <- lm_out$coefficients[1]+ lm_out$coefficients[2]*df_check$serial_day
+  #   
+  #   df_check_out <- cbind.data.frame(df_check[,c("dateRep","serial_day","deaths")],
+  #                                    rep(NA,nrow(df_check)),
+  #                                    rep(NA,nrow(df_check)),
+  #                                    rep(NA,nrow(df_check)),
+  #                                    check_predicted_value,
+  #                                    check_predicted_value + 2.66*AvgMR,
+  #                                    check_predicted_value - 2.66*AvgMR)
+  #   names(df_check_out) <- names(cchart_df)
+  #   df_cchart <- rbind(cchart_df,df_check_out,buffer_df)
+  # } else df_cchart <- rbind(cchart_df,buffer_df)
+  # 
+  # df_cchart$predict <- 10^df_cchart$lm_out.fitted.values
+  # df_cchart$UCL_anti_log <- 10^df_cchart$UCL
+  # df_cchart$LCL_anti_log <- 10^df_cchart$LCL
+  # 
+  # #df1_X_deaths is the dataframe with observed deaths, possibly truncated by user selection of Start Date for calculations
+  # #df_cchart is the dataframe that has observations and additional 'buffer' days, contains predicted values and limit values
+  # #lm_out is the linear model fitted to the log(deaths_nudge).
+  # results_list <- list(df1_X_deaths,df_cchart,lm_out)
   
-  if((length(start_date)==0) && nrow(df1_X_deaths) > series_length){
-  #if default 12/31/2019 start date, determine initial start to the series:  date of first death(s) 
+#}
 
-  #find starting index of the series that has length_use=8 death values greater than 0
-  #These needs some error handling
-    i <- 1
-    index_fail = TRUE
-    while(index_fail) {
-      index_check <- index_test(df1_X_deaths$deaths,i,length_use=series_length)
-      if(index_check[[1]]) {
-        index <- index_check[[2]]
-        index_fail <- FALSE
-      } else i <- i + 1
-    }
-    
-    #subset the data file so it starts with the sequence of 8 non-negative deaths
-    df1_X_deaths <- df1_X_deaths[index:nrow(df1_X_deaths),]
-
-  } else {
-    #take only data records starting with deaths, don't allow prior dates
-    df1_X_deaths <- df1_X_deaths %>% filter(dateRep >= max(as.Date(start_date),as.Date(start_date0))) 
-  } 
- 
-  #per Provost discussion, you can simply add 1 to deaths uniformly in the series.  
-  #KL note:  setting value to NA for a zero after an initial 8 non-zero values.
-  #df1_X_deaths$deaths_nudge <- unlist(lapply(df1_X_deaths$deaths,zero_NA))
-  df1_X_deaths$deaths_nudge <- df1_X_deaths$deaths # fix this 4/2/20....temp because I increment above
-  
-  df1_X_deaths$log_count_deaths <- log10(df1_X_deaths$deaths_nudge)
-  df1_X_deaths$serial_day <- c(1:nrow(df1_X_deaths))
-  
-  
-  data_use_cc <- df1_X_deaths[df1_X_deaths$serial_day <= baseline,]
-  buffer <- buffer_days
-  
-  #create linear model
-  #now compute the linear regression for the log10 counts 
-  #lm_out <- lm(data=data_use_cc,log_count_deaths ~ serial_day)
-  lm_out <- lm(data=data_use_cc,data_use_cc$log_count_deaths ~ data_use_cc$serial_day)
-  
-  #should handle the break in the series more elegantly if we use the 'replace embedded 0 with NA" rule
-  
-  cchart_df <- data.frame(data_use_cc[!is.na(data_use_cc$log_count_deaths),c("dateRep","serial_day","deaths","log_count_deaths")],
-                          lm_out$residuals,c(NA,diff(lm_out$residuals)),lm_out$fitted.values)
-  names(cchart_df)[5] <- "differences"
-  
-  AvgMR <- mean(abs(cchart_df$differences),na.rm=TRUE)
-  cchart_df$UCL <- lm_out$fitted.values + 2.66*AvgMR
-  cchart_df$LCL <- lm_out$fitted.values - 2.66*AvgMR
-  
-  
-  #buffer with buffer days beyond max date
-  buffer_serial_day <- seq(from=max(df1_X_deaths$serial_day)+1,to=max(df1_X_deaths$serial_day)+buffer,by=1)
-  predicted_value <- lm_out$coefficients[1]+ lm_out$coefficients[2]*buffer_serial_day
-  buffer_dates <- seq.Date(from=max(df1_X_deaths$dateRep)+1,to=max(df1_X_deaths$dateRep)+buffer,by="day")
-  buffer_df <- cbind.data.frame(buffer_dates,
-                                buffer_serial_day,
-                                rep(NA,buffer),
-                                rep(NA,buffer),
-                                rep(NA,buffer),
-                                rep(NA,buffer),
-                                predicted_value,
-                                predicted_value + 2.66*AvgMR,
-                                predicted_value - 2.66*AvgMR)
-  
-  names(buffer_df) <- names(cchart_df)
-  
-  #fill out the data table if not all observations are used to compute the control limits
-  if(max(df1_X_deaths$serial_day) > baseline){
-    df_check <- df1_X_deaths[df1_X_deaths$serial_day > baseline,]
-  
-    check_predicted_value <- lm_out$coefficients[1]+ lm_out$coefficients[2]*df_check$serial_day
-    
-    df_check_out <- cbind.data.frame(df_check[,c("dateRep","serial_day","deaths")],
-                                     rep(NA,nrow(df_check)),
-                                     rep(NA,nrow(df_check)),
-                                     rep(NA,nrow(df_check)),
-                                     check_predicted_value,
-                                     check_predicted_value + 2.66*AvgMR,
-                                     check_predicted_value - 2.66*AvgMR)
-    names(df_check_out) <- names(cchart_df)
-    df_cchart <- rbind(cchart_df,df_check_out,buffer_df)
-  } else df_cchart <- rbind(cchart_df,buffer_df)
-  
-  df_cchart$predict <- 10^df_cchart$lm_out.fitted.values
-  df_cchart$UCL_anti_log <- 10^df_cchart$UCL
-  df_cchart$LCL_anti_log <- 10^df_cchart$LCL
-  
-  #df1_X_deaths is the dataframe with observed deaths, possibly truncated by user selection of Start Date for calculations
-  #df_cchart is the dataframe that has observations and additional 'buffer' days, contains predicted values and limit values
-  #lm_out is the linear model fitted to the log(deaths_nudge).
-  results_list <- list(df1_X_deaths,df_cchart,lm_out)
-  
-}
 
 #
