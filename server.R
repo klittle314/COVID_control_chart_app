@@ -200,7 +200,7 @@ shinyServer(function(input, output, session) {
     #                         make_data()$lm_out is the linear model list.  COULD BE NULL
     #                         make_data()$df1_X is the raw data set, no models.   COULD BE NULL
     #                         make_data()$date_cutoffs is a list:    make_data()$date_cutoffs$first_death is date of first death.  COULD BE NA
-    #                                                               make_data()$date_cutoffs$c_chart_signal is date of signal on control chart, taken to be start of exponential growth.  COULD BE NA.
+    #                                                                make_data()$date_cutoffs$c_chart_signal is date of signal on control chart, taken to be start of exponential growth.  COULD BE NA.
     #                                                                make_data()$date_cutoffs$CL is the center line of the c-chart.  COULD BE NA
     #                                                                make_data()$date_cutoffs$C_UCL is the upper control limit of the c-chart.  COULD BE NA.
     
