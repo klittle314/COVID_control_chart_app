@@ -103,7 +103,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     checkboxInput(
                                       inputId = 'constrain_y_axis',
                                       label   = h5('Constrain y-axis limits to observed data (instead of projections)'),
-                                      value   = FALSE),
+                                      value   = TRUE),
                                     
                                     #Input date that marks the start of the limit calculations
                                     dateInput("start_date",label=h5("Custom Start Date for calculations"),value=defStartdate),
