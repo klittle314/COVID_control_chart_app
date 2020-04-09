@@ -213,6 +213,9 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
   df1_X <- create_stages(data=df1_X,date_cutoffs=date_cutoffs)
   
   df1_X$deaths_nudge <- df1_X$deaths
+  browser()
+  #filter the data to just the deaths series
+  df1_X <- df1_X %>% filter(stage != "Pre-deaths")
   
   data_results_list$df1_X <- df1_X
   
@@ -278,8 +281,7 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
              
              check_predicted_value <- lm_out$coefficients[1]+ lm_out$coefficients[2]*df1_X_post_fit$serial_day
              
-             df_post_fit_out <- cbind.data.frame(df1_X_post_fit[,c("dateRep","serial_day","deaths")],
-                                              rep(NA,nrows_post_fit),
+             df_post_fit_out <- cbind.data.frame(df1_X_post_fit[,c("dateRep","serial_day","deaths","log_10_deaths")],
                                               rep(NA,nrows_post_fit),
                                               rep(NA,nrows_post_fit),
                                               check_predicted_value,
