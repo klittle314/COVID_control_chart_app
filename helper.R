@@ -157,11 +157,13 @@ create_stages <- function(data1,date_cutoffs){
   }
   
   # If there has been a c-chart signal observed, stage 3 begins with that date and is at 
-  # least 8 subsequent days, up to 20 (determined by value of baseline argument).
+  # least 8 subsequent days with deaths > 0, up to 20 (determined by value of baseline argument).
   if (!is.na(date_cutoffs$c_chart_signal)) {
     stage3 <- data1 %>% filter(dateRep >= date_cutoffs$c_chart_signal) 
     
-    if (nrow(stage3) >= 8) {
+    stage3_check <- stage3 %>% filter(deaths > 0)
+    
+    if (nrow(stage3_check) >= 8) {
       
       stage3 <- head(stage3, baseline)
       
@@ -172,9 +174,12 @@ create_stages <- function(data1,date_cutoffs){
   }
   
   # If there has been a c-chart signal observed, and there's data after the c-chart signal
-  # start plus baseline period, make that stage 4
+  # start plus baseline period, make that stage 4  NEED TO ACCOUNT FOR ZEROS IN STAGE 3
   if (!is.na(date_cutoffs$c_chart_signal)) {
-    stage4 <- data1 %>% filter(dateRep >= date_cutoffs$c_chart_signal + baseline)
+      #count the number of records that have 0 in the death series for stage 3  
+      count_zeros <- length(stage3$deaths[identical(stage3$deaths,0)])
+      
+      stage4 <- data1 %>% filter(dateRep >= date_cutoffs$c_chart_signal + baseline + count_zeros)
     
     if(nrow(stage4)> 0) {
       stage4$stage <- 'Observations after exponential limits established'
@@ -259,15 +264,17 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
             
             
           #check for any values in stage 4; compute them
-          browser()
+          
           if(any(df1_X$stage=='Observations after exponential limits established')) {
              df1_X_post_fit <- df1_X %>% filter(stage=='Observations after exponential limits established')
-             
+             browser() #check the serial day values what is the max?  Error in df output, jump in serial day from 27 to 101??
              nrows_post_fit <- nrow(df1_X_post_fit)  
              
              start_index <- max(df1_X_exp_fit$serial_day)+1
              
              df1_X_post_fit$serial_day <- seq(from=start_index, length.out=nrows_post_fit,by=1)
+             
+             df1_X_post_fit$log_10_deaths <- log10(df1_X_post_fit$deaths)
              
              check_predicted_value <- lm_out$coefficients[1]+ lm_out$coefficients[2]*df1_X_post_fit$serial_day
              
@@ -285,9 +292,9 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
             }
           #now add the buffer
             #buffer with buffer days beyond max date
-            serial_day_buffer_start <- nrow(df1_X)
+            serial_day_buffer_start <- nrow(df_exp_fit)
             
-            buffer_dates <- seq.Date(from=max(df1_X$dateRep)+1,to=max(df1_X$dateRep)+buffer_days,by="day")
+            buffer_dates <- seq.Date(from=max(df_exp_fit$dateRep)+1,to=max(df_exp_fit$dateRep)+buffer_days,by="day")
             
             buffer_serial_day <- seq(from=serial_day_buffer_start+1,to=serial_day_buffer_start+buffer_days,by=1)
             
@@ -315,7 +322,6 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
             
             data_results_list$df_exp_fit <- df_exp_fit
       }
-      
       
    }  
  
