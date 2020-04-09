@@ -19,7 +19,9 @@ zero_NA <- function(x){
 }
 
 #function to find index that marks first sequence of length_use values.  Default length = 8 per Lloyd Provost 30 March 2020 
-index_test <- function(x,index,length_use=8){
+index_test <- function(x,
+                       index,
+                       length_use=8){
   x_check <- x[index:(index+length_use - 1)]
   if(all(x_check>0)){
     use_seq <- TRUE
@@ -35,7 +37,9 @@ index_test <- function(x,index,length_use=8){
 #frame with three columns (1 row):  the "Date_of_first_death","date_of_c-chart_signal","shift_rule_signal"
 #Shift rule signal is TRUE or FALSE
 
-find_start_date <- function(data,location_name,start_date=NA){
+find_start_date <- function(data,
+                            location_name,
+                            start_date=NA){
   df1_X <- data %>% filter(countriesAndTerritories == location_name) %>% arrange(dateRep)
   
   Rule_shift <- NA  
@@ -193,7 +197,11 @@ create_stages <- function(data1,date_cutoffs){
 
 
 #function to subset master data set by location_name, start_date and pad by buffer_days
-make_location_data <- function(data,location_name,buffer_days,baseline,start_date){
+make_location_data <- function(data,
+                               location_name,
+                               buffer_days,
+                               baseline,
+                               start_date){
   
   #create an object that will have data frames, dates of stages and the linear model fit
   data_results_list <- list()
@@ -213,7 +221,7 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
   df1_X <- create_stages(data=df1_X,date_cutoffs=date_cutoffs)
   
   df1_X$deaths_nudge <- df1_X$deaths
-  browser()
+  
   #filter the data to just the deaths series
   df1_X <- df1_X %>% filter(stage != "Pre-deaths")
   
@@ -270,7 +278,7 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
           
           if(any(df1_X$stage=='Observations after exponential limits established')) {
              df1_X_post_fit <- df1_X %>% filter(stage=='Observations after exponential limits established')
-             browser() #check the serial day values what is the max?  Error in df output, jump in serial day from 27 to 101??
+              #check the serial day values what is the max?  Error in df output, jump in serial day from 27 to 101??
              nrows_post_fit <- nrow(df1_X_post_fit)  
              
              start_index <- max(df1_X_exp_fit$serial_day)+1
@@ -331,4 +339,123 @@ make_location_data <- function(data,location_name,buffer_days,baseline,start_dat
    #make conditional:   output is df_X1, date_cutoffs, AND lm_out could be NULL and df_exp_fit could be NULL
   return(data_results_list)
 }
- 
+
+#this function makes the exponential chart, the log10 chart, the c-chart and death chart, along
+#with descriptive message
+#requires location name, buffer days, a list of data objects that is output from function make_location_dat
+#title for charts and caption for main display
+make_charts <- function(location_use,
+                        buffer,
+                        make_data,
+                        title1,
+                        caption_use,
+                        constrain_y_axis){
+  
+  df_no_fit <- make_data$df1_X
+  df_fit <- make_data$df_exp_fit
+  lm_fit <- make_data$lm_out
+  first_death_date <- make_data$date_cutoffs$first_death
+  exp_growth_date <- make_data$date_cutoffs$c_chart_signal
+  c_chart_CL <- make_data$date_cutoffs$CL_out
+  c_chart_UCL <- make_data$date_cutoffs$C_UCL_out
+  
+  
+  if(is.na(first_death_date)) {
+    p_out1 <- NULL
+    
+    p_out2 <- NULL
+    
+    message_out <- "No reported deaths"
+    
+  } else if(is.na(exp_growth_date)) {
+    if(nrow(df_no_fit) < 8) {
+      p_out1 <- ggplot(data=df_no_fit,
+                       aes(x=dateRep,y=deaths))+
+        theme_bw()+
+        geom_point()+
+        labs(title = title1)
+      
+      p_out2 <- NULL
+      
+      message_out <- "Series too short to analyze"
+    } else {
+      p_out1 <- ggplot(data=df_no_fit,
+                       aes(x=dateRep,y=deaths))+
+        theme_bw()+
+        geom_point()+
+        geom_line()+
+        labs(title = title1,
+             subtitle = "c-chart center line and limits",
+             caption = caption_use)+
+        geom_hline(yintercept=c_chart_CL)+
+        geom_hline(yintercept=c_chart_UCL,linetype="dashed")
+      
+      p_out2 <- NULL
+      
+      message_out <- "c-chart only"
+    }
+  }
+  else {
+    #plot the data used for the exponential fit
+    
+    p0 <- ggplot(data=df_fit,aes(x=dateRep,y=deaths))+
+      theme_bw()+
+      geom_point(size=rel(3.0),colour="blue")+
+      geom_line()+
+      labs(title=title1, 
+           caption = caption_use) +
+      xlab("")+
+      ylab("Deaths per day")+
+      # xlim(min(df_fit$dateRep),max(df_fit$dateRep)+buffer)+
+      theme(axis.text.x=element_text(size=rel(1.5)))+
+      theme(axis.text.y=element_text(size=rel(1.5)))+
+      theme(axis.title.x=element_text(size=rel(1)))+
+      theme(axis.title.y=element_text(size=rel(1),angle=0,vjust=0.5))+
+      theme(title=element_text(size=rel(1.5))) +
+      theme(plot.caption = element_text(hjust = 0))
+    
+    #overlay the exponential fit and the limits
+    p_out <- p0 + geom_line(data=df_fit,aes(x=dateRep,y=predict),linetype="solid",colour="red")+
+      geom_line(data=df_fit,aes(x=dateRep,y=UCL_anti_log),linetype="dotted")+
+      geom_line(data=df_fit,aes(x=dateRep,y=LCL_anti_log),linetype="dotted")
+    
+    #overlay the portion of the c-chart up to the point of the signal
+    start_date <- min(df_no_fit$dateRep)
+    
+    end_date <- exp_growth_date - 1
+    
+    p_out1 <- p_out + geom_point(data=df_no_fit[df_no_fit$dateRep < exp_growth_date,],
+                                 aes(x=dateRep,y=deaths))+
+      geom_segment(aes(x=start_date, xend=end_date, y=c_chart_CL, yend=c_chart_CL))+
+      geom_segment(aes(x=start_date, xend=end_date, y=c_chart_UCL, yend=c_chart_UCL),linetype="dashed")+
+      xlim(min(df_no_fit$dateRep),max(df_fit$dateRep))
+    
+    
+    if (constrain_y_axis) {
+      p_out1 <- p_out1 + scale_y_continuous(
+        limits = c(0, max(df_fit$deaths, na.rm = TRUE))
+      )
+    }   
+    
+    #retrict to the values used in the linear fit to plot the log chart
+    #df_cchart1 <- df_cchart %>% filter(serial_day <= baseline1)
+    
+    p_out2 <- ggplot(data=df_fit,aes(x=dateRep,y=log_10_deaths))+
+      theme_bw()+
+      geom_point(size=rel(2.5),colour="blue")+
+      geom_line()+
+      labs(title=paste0(location_use," Log10 Daily Reported Deaths"),
+           subtitle="Limits based on Individuals Shewhart chart calculations using regression residuals")+
+      ylab("Log10(Deaths)")+
+      xlab("")+
+      theme(axis.title.y=element_text(angle=0,vjust=0.5))+
+      geom_line(data=df_fit,aes(x=dateRep,y=lm_out.fitted.values))+
+      geom_line(data=df_fit,aes(x=dateRep,y=UCL),linetype="dotted")+
+      geom_line(data=df_fit,aes(x=dateRep,y=LCL),linetype="dotted")
+    
+    message_out <- "c-chart and exponential fit"
+  }
+  
+  return(list(message_out,p_out1,p_out2))
+  
+}
