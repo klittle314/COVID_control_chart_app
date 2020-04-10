@@ -127,6 +127,7 @@ shinyServer(function(input, output, session) {
     
     #make a list that has a frame of the original data, a frame to construct the limit chart, and the linear model
     make_data <- reactive({
+        
         location_use <- input$choose_location
         data1 <- display_data()
         buffer <- input$buffer
@@ -328,7 +329,7 @@ control_chartNEW <- reactive({
 })
    
     
-   browser() 
+   
     output$control_chart <- renderPlot({
         #FIX REQUIRED 4/2/2020
         #put conditional test:  plot just the data and message about short series, object control_chart()[[1]]
