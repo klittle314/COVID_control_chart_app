@@ -15,7 +15,11 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                 "click to link to USNWR article"),
                                 br(),
                                 helpText("Disclaimer:  App under construction, use with caution"),
-                                helpText("Not properly handling locations with sparse data! Adding 1 globally to deaths."),
+
+                                helpText("Not properly handling locations with sparse data!; added c-chart front end"),
+
+                              
+
                                 helpText("Questions? Contact Kevin Little, Ph.D."),
                                 br(),
                                 
@@ -25,7 +29,9 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                 em(
                                     span("Created by "),
                                     a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
-                                    span("updated 6 April 2020  11:50am CDT"),
+
+                                    span("updated 10 April 2020  8:50am CDT"),
+
                                     br(), br()
                                 )
                             )
