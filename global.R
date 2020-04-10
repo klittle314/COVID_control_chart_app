@@ -28,6 +28,18 @@ if (!file.exists(data_file_state)) {
                 destfile = data_file_state)
 }
 
+# delete old country/state data files that aren't necessary - not a big deal locally,
+# and they're excluded from the git repository, but we don't want to keep uploading
+# old data files to shinyapps
+data_files <- list.files(
+  path = 'data',
+  pattern = '(country|us_state)_.+\\.csv',
+  full.names = TRUE)
+
+data_files_remove <- setdiff(data_files, c(data_file_country, data_file_state))
+
+file.remove(data_files_remove)
+
 df_country <- read_csv(data_file_country)
 df_country$dateRep <- as.Date(df_country$dateRep, format = '%d/%m/%Y')
 country_names <- unique(df_country$countriesAndTerritories)
