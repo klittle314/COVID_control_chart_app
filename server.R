@@ -138,7 +138,7 @@ shinyServer(function(input, output, session) {
                                        buffer_days=buffer,
                                        baseline=baseline1,
                                        start_date=start_date1)
-        browser()
+        #browser()
         return(list_use)
     })
     
@@ -223,7 +223,7 @@ control_chartNEW <- reactive({
       # exp_growth_date <- make_data()$date_cutoffs$c_chart_signal
       # c_chart_CL <- make_data()$date_cutoffs$CL
       # c_chart_UCL <- make_data()$date_cutoffs$UCL
-      browser()
+      #browser()
       
       chart_list <- make_charts(location_use=location_use,buffer=buffer,
                                 make_data=make_data,title1=title1,caption_use=caption_use,
@@ -335,8 +335,7 @@ control_chartNEW <- reactive({
         #put conditional test:  plot just the data and message about short series, object control_chart()[[1]]
         #if series OK, then display control_chart()[[2]]
         #if no data, print message
-        
-        print(control_chartNEW()$pout_1)
+        print(control_chartNEW()$p_out1)
         
     })
     
@@ -345,7 +344,7 @@ control_chartNEW <- reactive({
         #put conditional test:  plot just the data and message about short series, object control_chart()[[1]]
         #if series OK, then display control_chart()[[2]]
         #if no data, print message
-        print(control_chartNEW()$pout_2)
+        print(control_chartNEW()$p_out2)
     })
     
     output$download_chart <- downloadHandler(

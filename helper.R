@@ -131,7 +131,7 @@ find_start_date <- function(data,
 }
 
 #new function to label stages, MDEC created 4-7-2020
-create_stages <- function(data1,date_cutoffs){
+create_stages <- function(data1,date_cutoffs, baseline){
   data_stages <- list()
   
   # if date_cutoffs$first_death is NA (no deaths), stage1 is the whole data.frame df1_X
@@ -218,7 +218,8 @@ make_location_data <- function(data,
   
   data_results_list$date_cutoffs <- date_cutoffs
    
-  df1_X <- create_stages(data=df1_X,date_cutoffs=date_cutoffs)
+  df1_X <- create_stages(data=df1_X,date_cutoffs=date_cutoffs,
+                         baseline = baseline)
   
   df1_X$deaths_nudge <- df1_X$deaths
   
@@ -398,7 +399,6 @@ make_charts <- function(location_use,
   }
   else {
     #plot the data used for the exponential fit
-    
     p0 <- ggplot(data=df_fit,aes(x=dateRep,y=deaths))+
       theme_bw()+
       geom_point(size=rel(3.0),colour="blue")+
@@ -456,7 +456,7 @@ make_charts <- function(location_use,
     
     message_out <- "c-chart and exponential fit"
   }
-  browser()
+  #browser()
   return(list(message_out=message_out,p_out1=p_out1,p_out2=p_out2))
   
 }
