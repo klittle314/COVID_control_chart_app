@@ -15,7 +15,11 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                 "click to link to USNWR article"),
                                 br(),
                                 helpText("Disclaimer:  App under construction, use with caution"),
-                                helpText("Not properly handling locations with sparse data!"),
+
+                                helpText("Not properly handling locations with sparse data!; added c-chart front end"),
+
+                              
+
                                 helpText("Questions? Contact Kevin Little, Ph.D."),
                                 br(),
                                 
@@ -25,7 +29,9 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                 em(
                                     span("Created by "),
                                     a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
-                                    span("updated 3 April 2020  11:50am CDT"),
+
+                                    span("updated 10 April 2020  8:50am CDT"),
+
                                     br(), br()
                                 )
                             )
@@ -103,7 +109,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     checkboxInput(
                                       inputId = 'constrain_y_axis',
                                       label   = h5('Constrain y-axis limits to observed data (instead of projections)'),
-                                      value   = FALSE),
+                                      value   = TRUE),
                                     
                                     #Input date that marks the start of the limit calculations
                                     dateInput("start_date",label=h5("Custom Start Date for calculations"),value=defStartdate),
