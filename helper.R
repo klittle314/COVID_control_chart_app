@@ -456,7 +456,7 @@ make_charts <- function(location_use,
     
     message_out <- "c-chart and exponential fit"
   }
-  
-  return(list(message_out,p_out1,p_out2))
+  browser()
+  return(list(message_out=message_out,p_out1=p_out1,p_out2=p_out2))
   
 }
