@@ -232,7 +232,8 @@ make_location_data <- function(data,
   #check if any embedded zeros in stage 3:  we will convert zero to NA on supposition that a zero in this phase represents missing data
   #create a new variable deaths_nudge to represent the adjusted death series
   ################# Allow over-ride of the calculated start_date by the user chosen start_date.#################
-  exp_fit_min_length <- 8
+  #exp_fit_min_length is the shortest number of records to use for the log of deaths and linear fit
+  exp_fit_min_length <- 5
   
   
   
