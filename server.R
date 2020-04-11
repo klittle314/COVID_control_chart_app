@@ -138,7 +138,7 @@ shinyServer(function(input, output, session) {
                                        buffer_days=buffer,
                                        baseline=baseline1,
                                        start_date=start_date1)
-        #browser()
+      
         return(list_use)
     })
     
@@ -223,7 +223,7 @@ control_chartNEW <- reactive({
       # exp_growth_date <- make_data()$date_cutoffs$c_chart_signal
       # c_chart_CL <- make_data()$date_cutoffs$CL
       # c_chart_UCL <- make_data()$date_cutoffs$UCL
-      #browser()
+    
       
       chart_list <- make_charts(location_use=location_use,buffer=buffer,
                                 make_data=make_data,title1=title1,caption_use=caption_use,
