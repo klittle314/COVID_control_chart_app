@@ -30,7 +30,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     span("Created by "),
                                     a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
 
-                                    span("updated 10 April 2020  8:50am CDT"),
+                                    span("updated 10 April 2020  10:30pm CDT"),
 
                                     br(), br()
                                 )
@@ -71,6 +71,8 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                             
                             sidebarLayout(
                                 sidebarPanel( 
+                                    width=3,
+                                    
                                     h4("Build a control chart by choosing location and adjusting options"),
                                     
                                     selectInput(
