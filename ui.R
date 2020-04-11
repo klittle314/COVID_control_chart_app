@@ -7,7 +7,7 @@ library(shinyBS)
 shinyUI(navbarPage("COVID-19 Control Chart Application",
                    
                    tabPanel("Overview",
-                            h3("Web App: HomeLAN Community Data and Display"),
+                            h3("Web App: COVID-19 Visualization"),
                             wellPanel(
                                 tags$style(type="text/css", '#leftPanel { width:200px; float:left;}'),
                                 helpText("U.S. News and World Report 3-26-2020 uses the method implemented here"),
@@ -30,9 +30,14 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     span("Created by "),
                                     a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
 
-                                    span("updated 10 April 2020  10:30pm CDT"),
+                                    span("updated 11 April 2020  2:30pm CDT"),
 
-                                    br(), br()
+                                    br(), br(),
+                                    
+                                #NYTimes attribution language
+                                helpText("U.S. data from from The New York Times, based on reports from state and local health agencies."),
+                                a(href="https://www.nytimes.com/interactive/2020/us/coronavirus-us-cases.html", 
+                                  "click to link to NYTimes U.S. tracking page")
                                 )
                             )
                    ),
@@ -145,7 +150,10 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                            h4("explanation goes here with parameters"),
                                            h6("linear fit parameters to log deaths"),
                                            textOutput("parameters"),
-                                           plotOutput("log_control_chart",height="300px")
+                                           plotOutput("log_control_chart",height="300px"),
+                                           
+                                  downloadButton(outputId = 'download_logchart',
+                                                 label = 'Download Chart')
                                            
                                     )
                                   )
