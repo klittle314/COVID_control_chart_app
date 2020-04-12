@@ -7,7 +7,7 @@ library(shinyBS)
 shinyUI(navbarPage("COVID-19 Control Chart Application",
                    
                    tabPanel("Overview",
-                            h3("Web App: HomeLAN Community Data and Display"),
+                            h3("Web App: COVID-19 Visualization"),
                             wellPanel(
                                 tags$style(type="text/css", '#leftPanel { width:200px; float:left;}'),
                                 helpText("U.S. News and World Report 3-26-2020 uses the method implemented here"),
@@ -30,10 +30,17 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     span("Created by "),
                                     a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
 
-                                    span("updated 10 April 2020  8:50am CDT"),
+                                    span("updated 11 April 2020  2:30pm CDT"),
 
-                                    br(), br()
-                                )
+                                    br(), br(),
+                                    
+                                
+                                ),
+                                
+                                #NYTimes attribution language
+                                helpText("U.S. data from from The New York Times, based on reports from state and local health agencies."),
+                                a(href="https://www.nytimes.com/interactive/2020/us/coronavirus-us-cases.html", 
+                                  "click to link to NYTimes U.S. tracking page")
                             )
                    ),
                    
@@ -71,14 +78,17 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                             
                             sidebarLayout(
                                 sidebarPanel( 
+                                    width=3,
+                                    
                                     h4("Build a control chart by choosing location and adjusting options"),
                                     
                                     selectInput(
                                       inputId = 'data_source',
                                       label   = h5('Choose data source'),
-                                      choices = c('Country-level ECDC data',
-                                                  'US state-level NY Times data',
-                                                  'User-uploaded data')),
+                                      choices = c('US state-level NY Times data',
+                                                  'Country-level ECDC data',
+                                                  'User-uploaded data'),
+                                      selected = 'US state-level NY Times data'),
                                     
                                     #drop down to select the Site Type
                                     # htmlOutput("selectSiteType"),
@@ -88,8 +98,8 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     selectInput(
                                         inputId  = 'choose_location',
                                         label    = h5("Choose location"),
-                                        choices  = sort(country_names),
-                                        selected = "United_States_of_America",
+                                        choices  = sort(state_names),
+                                        selected = "Alaska",
                                         width    = "100%"),
                                     
                                     #Numeric input for buffer
@@ -143,7 +153,10 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                            h4("explanation goes here with parameters"),
                                            h6("linear fit parameters to log deaths"),
                                            textOutput("parameters"),
-                                           plotOutput("log_control_chart",height="300px")
+                                           plotOutput("log_control_chart",height="300px"),
+                                           
+                                  downloadButton(outputId = 'download_logchart',
+                                                 label = 'Download Chart')
                                            
                                     )
                                   )
