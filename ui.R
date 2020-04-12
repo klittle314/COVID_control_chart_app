@@ -34,11 +34,13 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
 
                                     br(), br(),
                                     
+                                
+                                ),
+                                
                                 #NYTimes attribution language
                                 helpText("U.S. data from from The New York Times, based on reports from state and local health agencies."),
                                 a(href="https://www.nytimes.com/interactive/2020/us/coronavirus-us-cases.html", 
                                   "click to link to NYTimes U.S. tracking page")
-                                )
                             )
                    ),
                    
@@ -83,9 +85,10 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     selectInput(
                                       inputId = 'data_source',
                                       label   = h5('Choose data source'),
-                                      choices = c('Country-level ECDC data',
-                                                  'US state-level NY Times data',
-                                                  'User-uploaded data')),
+                                      choices = c('US state-level NY Times data',
+                                                  'Country-level ECDC data',
+                                                  'User-uploaded data'),
+                                      selected = 'US state-level NY Times data'),
                                     
                                     #drop down to select the Site Type
                                     # htmlOutput("selectSiteType"),
@@ -95,8 +98,8 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     selectInput(
                                         inputId  = 'choose_location',
                                         label    = h5("Choose location"),
-                                        choices  = sort(country_names),
-                                        selected = "United_States_of_America",
+                                        choices  = sort(state_names),
+                                        selected = "Alaska",
                                         width    = "100%"),
                                     
                                     #Numeric input for buffer
