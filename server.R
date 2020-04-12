@@ -175,8 +175,10 @@ control_chartNEW <- reactive({
         #put conditional test:  plot just the data and message about short series, object control_chart()[[1]]
         #if series OK, then display control_chart()[[2]]
         #if no data, print message
-        print(control_chartNEW()$p_out1)
-        
+        req(control_chartNEW())
+        if(control_chartNEW()$message_out != "No reported deaths") {
+              print(control_chartNEW()$p_out1)
+        }
     })
     
     output$log_control_chart <- renderPlot({
@@ -244,3 +246,5 @@ control_chartNEW <- reactive({
     )
     
  })
+
+
