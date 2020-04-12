@@ -81,7 +81,9 @@ find_start_date <- function(data,
           C_UCL <- CL + 3*sqrt(CL)
         
       } else {
-          CL <-mean(test_series0[1:cc_length])
+          #here we are implicitly restricting the c chart calculations to be no more than cc_length records after the first death
+          #if the series is shorter than cc_length, just remove the NA values at the bottom of the test_series0 vector
+          CL <-mean(test_series0[1:cc_length],na.rm=TRUE)
           
           C_UCL <- CL + 3*sqrt(CL)
         }
@@ -412,7 +414,7 @@ make_charts <- function(location_use,
       p_out1 <- ggplot(data=df_no_fit,
                        aes(x=dateRep,y=deaths))+
         theme_bw()+
-        geom_point()+
+        geom_point(size=rel(3.0))+
         geom_line()+
         labs(title = title1,
              subtitle = "c-chart center line and limits",
