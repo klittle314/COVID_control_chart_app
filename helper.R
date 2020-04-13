@@ -41,7 +41,7 @@ find_start_date <- function(data,
                             location_name,
                             start_date=NA){
   
-  browser()
+  
   df1_X <- data %>% filter(countriesAndTerritories == location_name) %>% arrange(dateRep)
   
   Rule_shift <- NA  
@@ -134,10 +134,129 @@ find_start_date <- function(data,
 
 }
 
+
+ 
+#function to take data frame, e.g. states df or countries df, a name for the country or state and returns a data 
+#frame with three columns (1 row):  the "Date_of_first_death","date_of_c-chart_signal","shift_rule_signal"
+#Shift rule signal is TRUE or FALSE.  It uses the Provost rule:   look for at least 8 deaths before applying the 
+#c-chart rules.
+find_start_date_Provost <- function(data,
+                                    location_name,
+                                    start_date=NA){
+  
+  
+  df1_X <- data %>% filter(countriesAndTerritories == location_name) %>% arrange(dateRep)
+  
+  Rule_shift <- NA  
+  
+  #bound the length of the calculations, no more than cc_length records used to compute center line and upper limit
+  #note that this parameter is NOT the same as the baseline parameter chosen by the user
+  cc_length <- 20
+  
+  if(any(df1_X$deaths >0,na.rm=TRUE)) {
+    
+    dates_of_deaths <- df1_X$dateRep[which(df1_X$deaths>0)]
+    
+    start_date0 <- dates_of_deaths[1]
+    
+    ##catch failure:  if data do not yield series with non zero deaths, use NA value of dates as condition##
+    df1_X_deaths <- df1_X %>% filter(dateRep >= start_date0)
+    
+    #Provost rule:   look for records that comprise the first 8 deaths. 
+    #replace_na is from tidyr  https://stackoverflow.com/questions/25576358/calculate-cumsum-while-ignoring-na-values
+    #because if upload a file with NA for deaths, the logic will fail,   Reliance on cumsum function to pull out the accumulated
+    #runs above the central line is also problematic--if NAs are in the death column, cumsum function will not work correctly.
+    
+    if(any(cumsum(replace_na(df1_X_deaths$deaths,0)) >= 8 )) {
+      index_Provost <- min(which(cumsum(replace_na(df1_X_deaths$deaths,0)) >=8),na.rm=TRUE)
+      
+      i <- index_Provost-1
+      
+      stop <- FALSE
+      
+      while(!stop) {
+        test_series0 <- df1_X_deaths %>% filter(dateRep >= start_date0 & dateRep <= start_date0+i) %>% pull(deaths)
+        
+        #fix the limits at cc_length if series has that many records
+        
+        if(length(test_series0) <= cc_length){
+          CL <- mean(test_series0, na.rm=TRUE)
+          
+          C_UCL <- CL + 3*sqrt(CL)
+          
+          x1 <- test_series0 > CL
+          
+          #https://stackoverflow.com/questions/48551492/count-consecutive-true-values-within-each-block-separately
+          # the next calculation will fail if there are NA values for deaths--the logic test in the 
+          #previous line will return NAs in the logical vector x1 corresponding to NAs in test_series0
+          #
+          x2 <- ave(x1, cumsum(!x1), FUN = cumsum)
+          
+        } else {
+          #here we are implicitly restricting the c chart calculations to be no more than cc_length records after the first death
+          #if the series is shorter than cc_length, just remove the NA values at the bottom of the test_series0 vector
+          CL <-mean(test_series0[1:cc_length],na.rm=TRUE)
+          
+          C_UCL <- CL + 3*sqrt(CL)
+          
+          x1 <- test_series0 > CL
+          
+          x2 <- ave(x1, cumsum(!x1), FUN = cumsum)
+        }
+        
+        Rule_1 <- any(which(test_series0 > C_UCL))
+        
+        Rule_shift = any(x2 >= 8)
+        
+        if(Rule_1){
+          index_start <- which.max(test_series0> C_UCL)
+          
+          start_date1 <- df1_X_deaths$dateRep[index_start]
+          
+          stop <- TRUE
+          
+        } else if(Rule_shift){
+          index_start <- which.max(x2)
+          
+          start_date1 <- df1_X_deaths$dateRep[index_start]
+          
+          stop <- TRUE
+        } else if(nrow(df1_X_deaths) > i) {
+          #j <- j+1 
+          i <- i+1
+        } else {
+          start_date1 <- NA
+          CL <- CL
+          C_UCL <- C_UCL
+          stop <- TRUE
+        }
+      }
+      #END OF THE LOOP CHECKING THAT THERE ARE RECORDS WITH DEATHS
+    } else {
+      start_date1 <- NA
+      CL <- NA
+      C_UCL <- NA
+    }
+  } else {
+    start_date0 <- NA
+    start_date1 <- NA
+    CL <- NA
+    C_UCL <- NA
+  }
+  
+  #pass the key dates and C-chart information.  Note that any or all of these objects may be NA
+  list(
+    first_death = start_date0,
+    c_chart_signal = start_date1,
+    CL_out = CL,
+    C_UCL_out = C_UCL)
+  
+}
+
 #new function to label stages, MDEC created 4-7-2020
 create_stages <- function(data1,date_cutoffs, baseline){
   data_stages <- list()
-  browser()
+  
   # if date_cutoffs$first_death is NA (no deaths), stage1 is the whole data.frame df1_X
   if (is.na(date_cutoffs$first_death)) stage1 <- data1
   else stage1 <- data1 %>% filter(dateRep < date_cutoffs$first_death)
@@ -203,6 +322,84 @@ create_stages <- function(data1,date_cutoffs, baseline){
   data_out <- dplyr::bind_rows(data_stages)
 }
 
+#new function to label stages, MDEC created 4-7-2020 and modified to accept Provost starting rule
+create_stages_Provost <- function(data1,date_cutoffs, baseline){
+  data_stages <- list()
+  
+  # if date_cutoffs$first_death is NA (no deaths), stage1 is the whole data.frame df1_X
+  if (is.na(date_cutoffs$first_death)) stage1 <- data1
+  else stage1 <- data1 %>% filter(dateRep < date_cutoffs$first_death)
+  
+  stage1$stage <- 'Pre-deaths'
+  data_stages$stage1 <- stage1
+  
+  # If there has been a death, stage 2 starts on the day of the first death,
+  
+  if (!is.na(date_cutoffs$first_death)) {
+    stage2 <- data1 %>% filter(dateRep >= date_cutoffs$first_death)
+    
+    
+    
+    # If c_chart_signal is observed, cut off stage2 before that date.
+    if (!is.na(date_cutoffs$c_chart_signal)) {
+      stage2 <- stage2 %>% filter(dateRep < date_cutoffs$c_chart_signal)
+    }
+    
+    stage2$stage <- 'Deaths observed before c-chart signal'
+    
+    data_stages$stage2 <- stage2
+    
+  }
+  
+  
+  browser()
+  # If there has been a c-chart signal observed, stage 3 begins with that date and is at 
+  # least 5 subsequent days with deaths > 0, up to 20 (determined by value of baseline argument).
+  min_length_chart <- 5
+  
+  if (!is.na(date_cutoffs$c_chart_signal)) {
+    stage3 <- data1 %>% filter(dateRep >= date_cutoffs$c_chart_signal) 
+    
+    stage3_check <- stage3 %>% filter(deaths > 0)
+    
+    if (nrow(stage3_check) >= min_length_chart) {
+      
+      stage3 <- head(stage3, baseline)
+      
+      stage3$stage <- 'Exponential growth and fit'
+      
+      data_stages$stage3 <- stage3
+    } else {
+      stage3_short <- TRUE
+      
+      stage3$stage <- 'Not enough data to fit exponential'
+      
+      data_stages$stage3 <- stage3
+    }
+  }
+  
+  
+  # If there has been a c-chart signal observed, and there's enough data after the c-chart signal
+  # start plus baseline period, make that stage 4  NEED TO ACCOUNT FOR ZEROS IN STAGE 3
+  # because these embedded zeros will be set to NA in the subsequent calculation of linear model
+  # when we take the log10 of deaths.
+  if (!stage3_short) {
+    #count the number of records that have 0 in the death series for stage 3  
+    count_zeros <- length(stage3$deaths[identical(stage3$deaths,0)])
+    
+    stage4 <- data1 %>% filter(dateRep >= date_cutoffs$c_chart_signal + baseline + count_zeros - 1)
+    
+    if(nrow(stage4)> 0) {
+      stage4$stage <- 'Observations after exponential limits established'
+      
+      data_stages$stage4 <- stage4
+    }
+  }
+  
+  
+  data_out <- dplyr::bind_rows(data_stages)
+}
+
 
 #function to subset master data set by location_name, start_date and pad by buffer_days
 #creates a list of objects:  
@@ -221,7 +418,7 @@ make_location_data <- function(data,
   #I can create data frames with 0 rows and dates of stages with NA values.   What about a 'null' linear model?
   data_results_list <- list()
     
- 
+  browser()
     
   
   df1_X <- data %>% filter(countriesAndTerritories == location_name) %>% arrange(dateRep)
@@ -232,11 +429,11 @@ make_location_data <- function(data,
   data_results_list$df_exp_fit <- data.frame()
   data_results_list$lm_out <- list()
   
-  date_cutoffs <- find_start_date(data = df1_X, location_name = location_name, start_date = start_date)
+  date_cutoffs <- find_start_date_Provost(data = df1_X, location_name = location_name, start_date = start_date)
   
   data_results_list$date_cutoffs <- date_cutoffs
    
-  df1_X <- create_stages(data=df1_X,date_cutoffs=date_cutoffs,
+  df1_X <- create_stages_Provost(data=df1_X,date_cutoffs=date_cutoffs,
                          baseline = baseline)
   
   df1_X$deaths_nudge <- df1_X %>% pull(deaths)
@@ -367,8 +564,8 @@ make_location_data <- function(data,
           
        }  
    }   
-      browser()
-   #make conditional:   output is df_X1, date_cutoffs, AND lm_out could be NULL and df_exp_fit could be NULL
+      
+   #make conditional:   output is df1_X, date_cutoffs, AND lm_out could be NULL and df_exp_fit could be NULL
   return(data_results_list)
 }
 
@@ -390,8 +587,8 @@ make_charts <- function(location_use,
   exp_growth_date <- make_data$date_cutoffs$c_chart_signal
   c_chart_CL <- make_data$date_cutoffs$CL_out
   c_chart_UCL <- make_data$date_cutoffs$C_UCL_out
+
   browser()
-  
   if(is.na(first_death_date)) {
     p_out1 <- list()
     
@@ -417,7 +614,7 @@ make_charts <- function(location_use,
         geom_point(size=rel(3.0))+
         geom_line()+
         labs(title = title1,
-             subtitle = "c-chart center line and limits",
+             subtitle = "c-chart center line (solid) and upper limit (dashed)",
              caption = caption_use)+
         geom_hline(yintercept=c_chart_CL)+
         geom_hline(yintercept=c_chart_UCL,linetype="dashed")
@@ -426,6 +623,22 @@ make_charts <- function(location_use,
       
       message_out <- "c-chart only"
     }
+  } else if(identical(nrow(df_fit),0)) {
+        #df_plot <- df  FINISH THIS LOGIC TO PLOT C CHART PLUS Less than 5 values in next phase
+    
+        p_out1 <- ggplot(data=df_no_fit,
+                       aes(x=dateRep,y=deaths))+
+        theme_bw()+
+        geom_point(size=rel(3.0))+
+        geom_line()+
+        labs(title = title1,
+             subtitle = "c-chart center line (solid) and upper limit (dashed)",
+             caption = caption_use)+
+        geom_hline(yintercept=c_chart_CL)+
+        geom_hline(yintercept=c_chart_UCL,linetype="dashed")
+      
+      p_out2 <- list()
+  
   } else {
     #plot the data used for the exponential fit
    
