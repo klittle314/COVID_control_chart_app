@@ -52,7 +52,9 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                        tags$li('date (MM/DD/YYYY format)'),
                        tags$li('cases'),
                        tags$li('deaths'),
-                       tags$li('location')
+                       tags$li('location'),
+                     br(),
+                     helpText('The current code will not handle NA values in the death series.  Zero values are fine.')
                      ),
                      
                      h5('Click',
@@ -99,7 +101,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                         inputId  = 'choose_location',
                                         label    = h5("Choose location"),
                                         choices  = sort(state_names),
-                                        selected = "Alaska",
+                                        selected = "Oregon",
                                         width    = "100%"),
                                     
                                     #Numeric input for buffer
