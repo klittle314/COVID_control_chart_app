@@ -10,15 +10,17 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                             h3("Web App: COVID-19 Visualization"),
                             wellPanel(
                                 tags$style(type="text/css", '#leftPanel { width:200px; float:left;}'),
+                                
                                 helpText("U.S. News and World Report 3-26-2020 uses the method implemented here"),
+                                
                                 a(href="https://www.usnews.com/news/healthiest-communities/articles/2020-03-26/coronavirus-pandemic-reaching-critical-tipping-point-in-america-analysis-shows",
                                 "click to link to USNWR article"),
                                 br(),
+                                
                                 helpText("Disclaimer:  App under construction, use with caution"),
 
-                                helpText("Error if input data series has no deaths, still to be fixed"),
+                                helpText("attributes of graphs and calculations need formatting help"),
 
-                              
 
                                 helpText("Questions? Contact Kevin Little, Ph.D."),
                                 br(),
@@ -30,10 +32,9 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     span("Created by "),
                                     a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
 
-                                    span("updated 14 April 2020  8:30am CDT"),
+                                    span("updated 15 April 2020  3:30pm CDT"),
 
                                     br(), br(),
-                                    
                                 
                                 ),
                                 
@@ -142,13 +143,17 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                 mainPanel(
                                   tabsetPanel(id = 'display-tab',type='tabs',  
                                     tabPanel("Basic Chart",
-                                              plotOutput("control_chart",height="500px"),
+                                              
+                                    uiOutput("message"),  
+                                    
+                                    plotOutput("control_chart",height="500px"),
                                              
                                     downloadButton(outputId = 'download_chart',
                                                    label = 'Download Chart'),
                                     
                                     tags$hr(),
                                     
+                                   
                                     DT::dataTableOutput('data_table')
                                     ),
                                   tabPanel("Calculation Details",

@@ -427,7 +427,7 @@ make_location_data <- function(data,
                                buffer_days,
                                baseline,
                                start_date){
- 
+ browser()
   #create an object that will have data frames, dates of stages and the linear model fit
   #I can create data frames with 0 rows and dates of stages with NA values.   What about a 'null' linear model?
   data_results_list <- list()
