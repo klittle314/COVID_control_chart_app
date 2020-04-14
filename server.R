@@ -166,6 +166,8 @@ control_chartNEW <- reactive({
       chart_list <- make_charts(location_use=location_use,buffer=buffer,
                                 make_data=make_data,title1=title1,caption_use=caption_use,
                                 constrain_y_axis = constrain_y_axis)
+      
+      #contents of chart_list:  message_out, p_out1, p_out2 
 })
    
     
@@ -204,15 +206,24 @@ control_chartNEW <- reactive({
     output$data_table <- DT::renderDataTable({
         #req(make_data())
        #df_out <- make_data()[[2]][,c(1,2,3,9,11,10)]
-       
-        df_out <- make_data()$df_exp_fit[,c("dateRep","serial_day","deaths",
-                                      "predict","LCL_anti_log","UCL_anti_log")]
-        names(df_out) <- c("Date Reported","Serial Day","Deaths","Predicted Deaths","Lower Limit","Upper Limit")
-        df_out$'Predicted Deaths' <- round(df_out$'Predicted Deaths',0)
-        df_out$'Lower Limit' <- round(df_out$'Lower Limit',0)
-        df_out$'Upper Limit' <- round(df_out$'Upper Limit',0)
-        DT::datatable(df_out,
-                      rownames=FALSE)
+      
+        message_out <- control_chartNEW()$message_out
+        if(message_out %in% use_raw_table_messages) {
+          df_out <- make_data()$df1_X[,c("dateRep","cases","deaths")]
+          names(df_out) <- c("Date Reported", "Cases","Deaths")
+          DT::datatable(df_out, 
+                        rownames=FALSE)
+        } else {
+      
+            df_out <- make_data()$df_exp_fit[,c("dateRep","serial_day","deaths",
+                                          "predict","LCL_anti_log","UCL_anti_log")]
+            names(df_out) <- c("Date Reported","Serial Day","Deaths","Predicted Deaths","Lower Limit","Upper Limit")
+            df_out$'Predicted Deaths' <- round(df_out$'Predicted Deaths',0)
+            df_out$'Lower Limit' <- round(df_out$'Lower Limit',0)
+            df_out$'Upper Limit' <- round(df_out$'Upper Limit',0)
+            DT::datatable(df_out,
+                          rownames=FALSE)
+        }
     })
     
     #add parameters to the calculations page

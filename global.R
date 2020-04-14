@@ -42,3 +42,8 @@ colnames(df_state) <- c('dateRep', 'countriesAndTerritories', 'fips', 'cases', '
 df_state <- df_state %>%group_by(countriesAndTerritories) %>% 
               mutate(lag_cum_deaths=lag(cum_deaths)) %>% mutate(deaths= cum_deaths-lag_cum_deaths)
 
+
+use_raw_table_messages <- c('Series too short to create a c-chart',
+                            'c-chart only',
+                            'c-chart plus values after initial signal',
+                            'c-chart plus values after initial signal, no sign of exponential growth')

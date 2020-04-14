@@ -600,7 +600,7 @@ make_charts <- function(location_use,
   c_chart_CL <- make_data$date_cutoffs$CL_out
   c_chart_UCL <- make_data$date_cutoffs$C_UCL_out
 
-  browser()
+ 
   #Here is the outline of the conditional logic that follows:
   #    if(no deaths)
   #         {create empty graph lists}
