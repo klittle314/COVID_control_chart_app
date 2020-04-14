@@ -16,7 +16,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                 br(),
                                 helpText("Disclaimer:  App under construction, use with caution"),
 
-                                helpText("Not properly showing tables of data for locations with no expo growth"),
+                                helpText("Error if input data series has no deaths, still to be fixed"),
 
                               
 
@@ -30,7 +30,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     span("Created by "),
                                     a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
 
-                                    span("updated 13 April 2020  11:30pm CDT"),
+                                    span("updated 14 April 2020  8:30am CDT"),
 
                                     br(), br(),
                                     
