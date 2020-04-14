@@ -600,6 +600,7 @@ make_charts <- function(location_use,
   c_chart_CL <- make_data$date_cutoffs$CL_out
   c_chart_UCL <- make_data$date_cutoffs$C_UCL_out
 
+  browser()
   #Here is the outline of the conditional logic that follows:
   #    if(no deaths)
   #         {create empty graph lists}
@@ -681,7 +682,8 @@ make_charts <- function(location_use,
           
           message_out <- "c-chart plus values after initial signal"
           
-  } else if(lm_fit$coefficients[2] < 0) {
+  } else if(confint(lm_fit,'df1_X_exp_fit$serial_day',level= 0.95)[1] < 0) {
+      #lm_fit$coefficients[2]
       #points after special cause signal lead to negative slope estimate. 
       #alternatively, compute 95% confidence interval and require CI for slope to have lower point > 0
       # conf_int_slope <- confint(lm_fit,'df1_X_exp_fit$serial_day',level= 0.95)[1]
