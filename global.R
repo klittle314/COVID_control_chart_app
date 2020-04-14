@@ -47,3 +47,5 @@ use_raw_table_messages <- c('Series too short to create a c-chart',
                             'c-chart only',
                             'c-chart plus values after initial signal',
                             'c-chart plus values after initial signal, no sign of exponential growth')
+
+use_new_expo_table_messages <- c('c-chart and exponential fit')
