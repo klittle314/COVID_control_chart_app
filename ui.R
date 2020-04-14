@@ -16,7 +16,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                 br(),
                                 helpText("Disclaimer:  App under construction, use with caution"),
 
-                                helpText("Not properly handling locations with sparse data!; added c-chart front end"),
+                                helpText("Not properly showing tables of data for locations with no expo growth"),
 
                               
 
@@ -30,7 +30,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     span("Created by "),
                                     a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
 
-                                    span("updated 11 April 2020  2:30pm CDT"),
+                                    span("updated 13 April 2020  11:30pm CDT"),
 
                                     br(), br(),
                                     
@@ -101,7 +101,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                         inputId  = 'choose_location',
                                         label    = h5("Choose location"),
                                         choices  = sort(state_names),
-                                        selected = "Oregon",
+                                        selected = "New York",
                                         width    = "100%"),
                                     
                                     #Numeric input for buffer
