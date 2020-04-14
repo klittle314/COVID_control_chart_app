@@ -434,7 +434,7 @@ make_location_data <- function(data,
  
   df1_X <- data %>% filter(countriesAndTerritories == location_name) %>% arrange(dateRep)
   #dates_of_deaths <- df1_X$dateRep[which(df1_X$deaths>0)]
-  
+
   #initialize two list entries that are conditionally calculated by the rest of the function  Create empty df, not null object!
   #the first df will have 0 rows and the list will have length 0.
   data_results_list$df_exp_fit <- data.frame()
@@ -451,7 +451,7 @@ make_location_data <- function(data,
   
   #filter the data to just the deaths series. Assumes that if there is a name, there is at least one record in the data table.
   #Need to allow for a series that has only 0 deaths.
-   if(any(df1_X$deaths > 0)) {  
+   if(any(df1_X$deaths > 0, na.rm=TRUE)) {  
       df1_X <- df1_X %>% filter(stage != "Pre-deaths")
       
       #may not need to rename stage to stage_data--that is legacy of bug fixing on 4-10, stage is a function name.
