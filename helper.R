@@ -172,10 +172,9 @@ find_start_date_Provost <- function(data,
     
     start_date0 <- dates_of_deaths[1]
     
-    ##catch failure:  if data do not yield series with non zero deaths, use NA value of dates as condition##
     df1_X_deaths <- df1_X %>% filter(dateRep >= start_date0)
     
-    #Provost rule:   look for records that comprise the first 8 deaths. 
+    #Provost rule:   look for records that comprise the first 8 deaths. This is a parameter that could be changed so needs definition.
     #replace_na is from tidyr  https://stackoverflow.com/questions/25576358/calculate-cumsum-while-ignoring-na-values
     #because if upload a file with NA for deaths, the logic will fail,   Reliance on cumsum function to pull out the accumulated
     #runs above the central line is also problematic--if NAs are in the death column, cumsum function will not work correctly.
