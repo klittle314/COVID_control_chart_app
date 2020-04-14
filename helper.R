@@ -364,7 +364,7 @@ create_stages_Provost <- function(data1,date_cutoffs, baseline){
     
   }
   
-  browser()
+ 
   # If there has been a c-chart signal observed, stage 3 begins with that date and is at 
   # least 5 subsequent days with deaths > 0, up to 20 (determined by value of baseline argument).
   min_length_chart <- 5
@@ -432,10 +432,7 @@ make_location_data <- function(data,
   #create an object that will have data frames, dates of stages and the linear model fit
   #I can create data frames with 0 rows and dates of stages with NA values.   What about a 'null' linear model?
   data_results_list <- list()
-    
-  browser()
-    
-  
+ 
   df1_X <- data %>% filter(countriesAndTerritories == location_name) %>% arrange(dateRep)
   #dates_of_deaths <- df1_X$dateRep[which(df1_X$deaths>0)]
   
@@ -603,7 +600,6 @@ make_charts <- function(location_use,
   c_chart_CL <- make_data$date_cutoffs$CL_out
   c_chart_UCL <- make_data$date_cutoffs$C_UCL_out
 
-  browser()
   #Here is the outline of the conditional logic that follows:
   #    if(no deaths)
   #         {create empty graph lists}
