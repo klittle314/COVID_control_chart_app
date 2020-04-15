@@ -367,7 +367,10 @@ make_location_data <- function(data,
                  
                  df1_X_post_fit$serial_day <- seq(from=start_index, length.out=nrows_post_fit,by=1)
                  
-                 df1_X_post_fit$log_10_deaths <- log10(df1_X_post_fit$deaths)
+                 #I should check for reported 0 deaths in this epoch just like in stage 3
+                 df1_X_post_fit$deaths_nudge <- unlist(lapply(df1_X_post_fit$deaths_nudge,zero_NA))
+                 
+                 df1_X_post_fit$log_10_deaths <- log10(df1_X_post_fit$deaths_nudge)
                  
                  check_predicted_value <- lm_out$coefficients[1]+ lm_out$coefficients[2]*df1_X_post_fit$serial_day
                  
