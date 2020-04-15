@@ -127,17 +127,17 @@ shinyServer(function(input, output, session) {
     
     #make a list that has a frame of the original data, a frame to construct the limit chart, and the linear model
     make_data <- reactive({
-        
+       
         location_use <- input$choose_location
         data1 <- display_data()
         buffer <- input$buffer
         baseline1 <- input$baseline_n
-        start_date1 <- input$start_date
+        start_date_user <- input$start_date
         list_use <- make_location_data(data=data1,
                                        location_name=location_use,
                                        buffer_days=buffer,
                                        baseline=baseline1,
-                                       start_date=start_date1)
+                                       start_date=start_date_user)
       
         return(list_use)
     })
@@ -203,27 +203,41 @@ control_chartNEW <- reactive({
         }
     )
     
+    data_for_table <- reactive({
+      #make the stuff that I want to use goes here
+      message_out <- control_chartNEW()$message_out
+      if(message_out %in% use_raw_table_messages) {
+        df_out <- make_data()$df1_X[,c("dateRep","cases","deaths")]
+        
+        names(df_out) <- c("Date Reported", "Cases","Deaths")
+        
+      } else if(message_out %in% use_new_expo_table_messages) {
+        df_out <- make_data()$df_exp_fit[,c("dateRep","serial_day","deaths",
+                                            "predict","LCL_anti_log","UCL_anti_log")]
+        names(df_out) <- c("Date Reported","Serial Day","Deaths","Predicted Deaths","Lower Limit","Upper Limit")
+        df_out$'Predicted Deaths' <- round(df_out$'Predicted Deaths',0)
+        df_out$'Lower Limit' <- round(df_out$'Lower Limit',0)
+        df_out$'Upper Limit' <- round(df_out$'Upper Limit',0)
+        
+      } else {
+        
+        df_out <- NULL
+      }
+      
+      return(df_out)
+    })
+    
+    output$message <- renderUI({
+         h4(control_chartNEW()$message_out)
+    })
+       
+   
+     
     output$data_table <- DT::renderDataTable({
-        #req(make_data())
-       #df_out <- make_data()[[2]][,c(1,2,3,9,11,10)]
-      
-        message_out <- control_chartNEW()$message_out
-        if(message_out %in% use_raw_table_messages) {
-          df_out <- make_data()$df1_X[,c("dateRep","cases","deaths")]
-          names(df_out) <- c("Date Reported", "Cases","Deaths")
-          DT::datatable(df_out, 
-                        rownames=FALSE)
-        } else {
-      
-            df_out <- make_data()$df_exp_fit[,c("dateRep","serial_day","deaths",
-                                          "predict","LCL_anti_log","UCL_anti_log")]
-            names(df_out) <- c("Date Reported","Serial Day","Deaths","Predicted Deaths","Lower Limit","Upper Limit")
-            df_out$'Predicted Deaths' <- round(df_out$'Predicted Deaths',0)
-            df_out$'Lower Limit' <- round(df_out$'Lower Limit',0)
-            df_out$'Upper Limit' <- round(df_out$'Upper Limit',0)
-            DT::datatable(df_out,
-                          rownames=FALSE)
-        }
+        req(data_for_table())
+       
+      DT::datatable(data_for_table(),
+                    rownames=FALSE)
     })
     
     #add parameters to the calculations page

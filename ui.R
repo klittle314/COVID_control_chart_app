@@ -10,15 +10,17 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                             h3("Web App: COVID-19 Visualization"),
                             wellPanel(
                                 tags$style(type="text/css", '#leftPanel { width:200px; float:left;}'),
+                                
                                 helpText("U.S. News and World Report 3-26-2020 uses the method implemented here"),
+                                
                                 a(href="https://www.usnews.com/news/healthiest-communities/articles/2020-03-26/coronavirus-pandemic-reaching-critical-tipping-point-in-america-analysis-shows",
                                 "click to link to USNWR article"),
                                 br(),
+                                
                                 helpText("Disclaimer:  App under construction, use with caution"),
 
-                                helpText("Error if input data series has no deaths, still to be fixed"),
+                                helpText("attributes of graphs and calculations need formatting effort"),
 
-                              
 
                                 helpText("Questions? Contact Kevin Little, Ph.D."),
                                 br(),
@@ -30,10 +32,9 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     span("Created by "),
                                     a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
 
-                                    span("updated 14 April 2020  8:30am CDT"),
+                                    span("updated 15 April 2020  9:45pm CDT"),
 
                                     br(), br(),
-                                    
                                 
                                 ),
                                 
@@ -111,7 +112,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     #br(),
                                     #Numeric input for baseline series length used to compute control limits
                                     #The default value should be chosen by code:  requires at least 8 days no more than 20
-                                    numericInput("baseline_n", label = h5("Maximum days used to compute limits"), value = defBaseline, min = 8),
+                                    numericInput("baseline_n", label = h5("Maximum days used to compute exponential growth line and limits"), value = defBaseline, min = 8),
                                     helpText(h6("If there are fewer days in the data series than the maximum, app calculates using all the data.")),
                                    #br(),
                                     
@@ -124,8 +125,8 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                       value   = TRUE),
                                     
                                     #Input date that marks the start of the limit calculations
-                                    dateInput("start_date",label=h5("Custom Start Date for calculations"),value=defStartdate),
-                                    helpText(h6("Leave blank to allow the start date to be calculated")),
+                                    dateInput("start_date",label=h5("Custom start date for calculations instead of date of first death"),value=defStartdate),
+                                    helpText(h6("Leave blank to allow the start date to be determined as date of first reported death")),
                                     #helpText(h6("The starting date 2019-12-31 tells the app to use all the available data.")),
                                     helpText(h6("You can choose a date after start of the series to focus the graph and calculations on a shorter date range.")),
                                    
@@ -142,13 +143,17 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                 mainPanel(
                                   tabsetPanel(id = 'display-tab',type='tabs',  
                                     tabPanel("Basic Chart",
-                                              plotOutput("control_chart",height="500px"),
+                                              
+                                    uiOutput("message"),  
+                                    
+                                    plotOutput("control_chart",height="500px"),
                                              
                                     downloadButton(outputId = 'download_chart',
                                                    label = 'Download Chart'),
                                     
                                     tags$hr(),
                                     
+                                   
                                     DT::dataTableOutput('data_table')
                                     ),
                                   tabPanel("Calculation Details",

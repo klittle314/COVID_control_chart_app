@@ -155,7 +155,7 @@ find_start_date <- function(data,
 #c-chart rules.
 find_start_date_Provost <- function(data,
                                     location_name,
-                                    start_date=NA){
+                                    start_date=start_date){
   
   
   df1_X <- data %>% filter(countriesAndTerritories == location_name) %>% arrange(dateRep)
@@ -165,12 +165,21 @@ find_start_date_Provost <- function(data,
   #bound the length of the calculations, no more than cc_length records used to compute center line and upper limit
   #note that this parameter is NOT the same as the baseline parameter chosen by the user
   cc_length <- 20
-  
+
   if(any(df1_X$deaths >0,na.rm=TRUE)) {
     
     dates_of_deaths <- df1_X$dateRep[which(df1_X$deaths>0)]
     
-    start_date0 <- dates_of_deaths[1]
+    dates_of_deaths <- df1_X$dateRep[which(df1_X$deaths>0)]
+    
+    start_date_deaths <- dates_of_deaths[1]
+    
+    #allow the user to start the analysis after the date of first death
+    if(length(start_date)==0) {
+    
+        start_date0 <- start_date_deaths
+    
+      } else start_date0 <- max(start_date,start_date_deaths)
     
     df1_X_deaths <- df1_X %>% filter(dateRep >= start_date0)
     
@@ -179,19 +188,26 @@ find_start_date_Provost <- function(data,
     #because if upload a file with NA for deaths, the logic will fail,   Reliance on cumsum function to pull out the accumulated
     #runs above the central line is also problematic--if NAs are in the death column, cumsum function will not work correctly.
     
+    
+    
     if(any(cumsum(replace_na(df1_X_deaths$deaths,0)) >= 8 )) {
       index_Provost <- min(which(cumsum(replace_na(df1_X_deaths$deaths,0)) >=8),na.rm=TRUE)
       
+      #Australia_nudge named in honor of Australia which @4-12-2020 had an initial series length 25 and then c-chart signal at the next record
+      Australia_nudge <- 5
+      
       i <- index_Provost-1
+      
+      cc_length_adjusted <- max(cc_length,index_Provost+Australia_nudge, na.rm=TRUE)
       
       stop <- FALSE
       
       while(!stop) {
         test_series0 <- df1_X_deaths %>% filter(dateRep >= start_date0 & dateRep <= start_date0+i) %>% pull(deaths)
         
-        #fix the limits at cc_length if series has that many records
+        #fix the limits at cc_length_adjusted if series has that many records
         
-        if(length(test_series0) <= cc_length){
+        if(length(test_series0) <= cc_length_adjusted){
           CL <- mean(test_series0, na.rm=TRUE)
           
           C_UCL <- CL + 3*sqrt(CL)
@@ -205,9 +221,9 @@ find_start_date_Provost <- function(data,
           x2 <- ave(x1, cumsum(!x1), FUN = cumsum)
           
         } else {
-          #here we are implicitly restricting the c chart calculations to be no more than cc_length records after the first death
-          #if the series is shorter than cc_length, just remove the NA values at the bottom of the test_series0 vector
-          CL <-mean(test_series0[1:cc_length],na.rm=TRUE)
+          #here we are implicitly restricting the c chart calculations to be no more than cc_length_adjusted records after the first death
+          #if the series is shorter than cc_length_adjusted, just remove the NA values at the bottom of the test_series0 vector
+          CL <-mean(test_series0[1:cc_length_adjusted],na.rm=TRUE)
           
           C_UCL <- CL + 3*sqrt(CL)
           
@@ -434,7 +450,7 @@ make_location_data <- function(data,
  
   df1_X <- data %>% filter(countriesAndTerritories == location_name) %>% arrange(dateRep)
   #dates_of_deaths <- df1_X$dateRep[which(df1_X$deaths>0)]
-  
+
   #initialize two list entries that are conditionally calculated by the rest of the function  Create empty df, not null object!
   #the first df will have 0 rows and the list will have length 0.
   data_results_list$df_exp_fit <- data.frame()
@@ -451,7 +467,7 @@ make_location_data <- function(data,
   
   #filter the data to just the deaths series. Assumes that if there is a name, there is at least one record in the data table.
   #Need to allow for a series that has only 0 deaths.
-   if(any(df1_X$deaths > 0)) {  
+   if(any(df1_X$deaths > 0, na.rm=TRUE)) {  
       df1_X <- df1_X %>% filter(stage != "Pre-deaths")
       
       #may not need to rename stage to stage_data--that is legacy of bug fixing on 4-10, stage is a function name.
