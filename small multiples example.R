@@ -1,6 +1,6 @@
 library(geofacet)
 library(png)
-library
+library(tidyr)
 
 #Suggested Citation:												
   #Table 1. Annual Estimates of the Resident Population for the United States, Regions, States, and Puerto Rico: April 1, 2010 to July 1, 2019 (NST-EST2019-01)												
@@ -8,16 +8,19 @@ library
 #Release Date: December 2019												
 
 library(readxl)
+#you need to get table of U.S. population, this is referring to file in my local directory.  It has 2 cols:  state name and pop size
 StatePopJuly2019 <- read_excel("~/COVID 2020/Provost_control_chart/StatePopJuly2019.xlsx")
 
+#for some reason the US Census file put periods in front of each state's name so I had to remove.  '.' is a reserved character
+# in strings, hence I needed to 'escape' it with backslashes.
 StatePopJuly2019$State <- gsub("\\.","",StatePopJuly2019$State)
 
 df_state0 <- df_state
 
 names(df_state0)[2] <- "State"
-df_state1 <- df_state0 %>% filter(fips <=56)
+df_state1 <- df_state0 %>% filter(fips <=56) #to remove the territories and Puerto Rico from the NYTimes dataset
 
-df_state_use <- left_join(df_state1,StatePopJuly2019,by=(c("State")))
+df_state_use <- left_join(df_state1,StatePopJuly2019,by=c("State"))
 
 df_state_use$deaths_per_ht <- 100000*df_state_use$deaths/df_state_use$Pop_July_2019
 
