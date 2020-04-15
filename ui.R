@@ -32,7 +32,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     span("Created by "),
                                     a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
 
-                                    span("updated 14 April 2020  9:45pm CDT"),
+                                    span("updated 15 April 2020  9:00am CDT"),
 
                                     br(), br(),
                                 
