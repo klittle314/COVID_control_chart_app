@@ -32,7 +32,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     span("Created by "),
                                     a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
 
-                                    span("updated 15 April 2020  9:45pm CDT"),
+                                    span("updated 15 April 2020  9:00am CDT"),
 
                                     br(), br(),
                                 
@@ -91,7 +91,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                       choices = c('US state-level NY Times data',
                                                   'Country-level ECDC data',
                                                   'User-uploaded data'),
-                                      selected = 'US state-level NY Times data'),
+                                      selected = 'Country-level ECDC data'),
                                     
                                     #drop down to select the Site Type
                                     # htmlOutput("selectSiteType"),
@@ -101,8 +101,8 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     selectInput(
                                         inputId  = 'choose_location',
                                         label    = h5("Choose location"),
-                                        choices  = sort(state_names),
-                                        selected = "New York",
+                                        choices  = sort(country_names),
+                                        selected = "United_States_of_America",
                                         width    = "100%"),
                                     
                                     #Numeric input for buffer
