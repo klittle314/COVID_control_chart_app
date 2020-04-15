@@ -46,108 +46,6 @@ index_test <- function(x,
   return(list(use_seq,index_use))
 }
 
-#function to take data frame, e.g. states df or countries df, a name for the country or state and returns a data 
-#frame with three columns (1 row):  the "Date_of_first_death","date_of_c-chart_signal","shift_rule_signal"
-#Shift rule signal is TRUE or FALSE
-
-find_start_date <- function(data,
-                            location_name,
-                            start_date=NA){
-  
-  
-  df1_X <- data %>% filter(countriesAndTerritories == location_name) %>% arrange(dateRep)
-  
-  Rule_shift <- NA  
-  #bound the length of the calculations, no more than cc_length records used to compute center line and upper limit
-  #note that this parameter is NOT the same as the baseline parameter chosen by the user
-  cc_length <- 20
-  
-  if(any(df1_X$deaths >0,na.rm=TRUE)) {
-    
-    dates_of_deaths <- df1_X$dateRep[which(df1_X$deaths>0)]
-    
-    start_date0 <- dates_of_deaths[1]
-    
-    ##catch failure:  if data do not yield series with non zero deaths, use NA value of dates as condition##
-    df1_X_deaths <- df1_X %>% filter(dateRep >= start_date0)
-    #df1_X_deaths <- df1_X %>% filter(dateRep >= as.Date("2020-01-01"))
-    #df1_X_deaths <- df1_X %>% filter(dateRep >= start_date0-10)
-    
-    if(nrow(df1_X_deaths) > 7) {
-      #j is index of start of the current 8 values in the test series, used to identify shift signal
-      
-      j <- 1
-      
-      i <- 7
-      
-      stop <- FALSE
-      
-      while(!stop) {
-        test_series0 <- df1_X_deaths %>% filter(dateRep >= start_date0 & dateRep <= start_date0+i) %>% pull(deaths)
-        
-        test_series_shift <- test_series0[j:(i+1)]
-        #fix the limits at cc_length if series has that many records
-        
-        if(j <= cc_length - i){
-          CL <- mean(test_series0)
-         
-          C_UCL <- CL + 3*sqrt(CL)
-        
-      } else {
-          #here we are implicitly restricting the c chart calculations to be no more than cc_length records after the first death
-          #if the series is shorter than cc_length, just remove the NA values at the bottom of the test_series0 vector
-          CL <-mean(test_series0[1:cc_length],na.rm=TRUE)
-          
-          C_UCL <- CL + 3*sqrt(CL)
-        }
-        
-        Rule_1 <- any(which(test_series0 > max(1,C_UCL)))
-        
-        Rule_shift = length(which(test_series_shift > CL)) >=8
-        
-        if(Rule_1){
-          index_start <- which.max(test_series0> max(1,C_UCL))
-          
-          start_date1 <- df1_X_deaths$dateRep[index_start]
-          
-          stop <- TRUE
-       
-       } else if(Rule_shift){
-          start_date1 <- df1_X_deaths$dateRep[i+1] 
-          stop <- TRUE
-        } else if(nrow(df1_X_deaths) > i) {
-          j <- j+1 
-          i <- i+1
-        } else {
-          start_date1 <- NA
-          CL <- CL
-          C_UCL <- C_UCL
-          stop <- TRUE
-        }
-      }
-      
-    } else {
-      start_date1 <- NA
-      CL <- NA
-      C_UCL <- NA
-    }
-  } else {
-    start_date0 <- NA
-    start_date1 <- NA
-    CL <- NA
-    C_UCL <- NA
-  }
-
-  #pass the key dates and C-chart information.  Note that any or all of these objects may be NA
-  list(
-    first_death = start_date0,
-    c_chart_signal = start_date1,
-    CL_out = CL,
-    C_UCL_out = C_UCL)
-
-}
-
-
  
 #function to take data frame, e.g. states df or countries df, a name for the country or state and returns a data 
 #frame with three columns (1 row):  the "Date_of_first_death","date_of_c-chart_signal","shift_rule_signal"
@@ -281,79 +179,11 @@ find_start_date_Provost <- function(data,
   
 }
 
-#function to label stages, MDEC created 4-7-2020
-create_stages <- function(data1,date_cutoffs, baseline){
-  data_stages <- list()
-  
-  # if date_cutoffs$first_death is NA (no deaths), stage1 is the whole data.frame df1_X
-  if (is.na(date_cutoffs$first_death)) stage1 <- data1
-  else stage1 <- data1 %>% filter(dateRep < date_cutoffs$first_death)
-  
-  stage1$stage <- 'Pre-deaths'
-  data_stages$stage1 <- stage1
-  
-  # If there has been a death, stage 2 is df1_X starting on the day of the first death,
-  # and must be at least 8 days
-  if (!is.na(date_cutoffs$first_death)) {
-    stage2 <- data1 %>% filter(dateRep >= date_cutoffs$first_death)
-    
-    # Must be at least 8 records long
-    if (nrow(stage2) >= 8) {
-      
-      # If c_chart_signal is observed, cut off stage2 before that date.
-      if (!is.na(date_cutoffs$c_chart_signal)) {
-        stage2 <- stage2 %>% filter(dateRep < date_cutoffs$c_chart_signal)
-      }
-      
-      stage2$stage <- 'Deaths observed before c-chart signal'
-      
-      data_stages$stage2 <- stage2
-    }
-  }
-    
- 
-  
-   # If there has been a c-chart signal observed, stage 3 begins with that date and is at 
-  # least 5 subsequent days with deaths > 0, up to 20 (determined by value of baseline argument).
-  if (!is.na(date_cutoffs$c_chart_signal)) {
-    stage3 <- data1 %>% filter(dateRep >= date_cutoffs$c_chart_signal) 
-    
-    stage3_check <- stage3 %>% filter(deaths > 0)
-    
-    if (nrow(stage3_check) >= 5) {
-      
-      stage3 <- head(stage3, baseline)
-      
-      stage3$stage <- 'Exponential growth and fit'
-      
-      data_stages$stage3 <- stage3
-    }
-  }
-    
-  
-  # If there has been a c-chart signal observed, and there's data after the c-chart signal
-  # start plus baseline period, make that stage 4  NEED TO ACCOUNT FOR ZEROS IN STAGE 3
-  if (!is.na(date_cutoffs$c_chart_signal)) {
-      #count the number of records that have 0 in the death series for stage 3  
-      count_zeros <- length(stage3$deaths[identical(stage3$deaths,0)])
-      
-      stage4 <- data1 %>% filter(dateRep >= date_cutoffs$c_chart_signal + baseline + count_zeros)
-    
-    if(nrow(stage4)> 0) {
-      stage4$stage <- 'Observations after exponential limits established'
-      
-      data_stages$stage4 <- stage4
-    }
-  }
-     
-  
-  data_out <- dplyr::bind_rows(data_stages)
-}
 
 #new function to label stages, MDEC created 4-7-2020 and modified to accept Provost starting rule
 create_stages_Provost <- function(data1,date_cutoffs, baseline){
   data_stages <- list()
-  
+  browser()
   # if date_cutoffs$first_death is NA (no deaths), stage1 is the whole data.frame 
   if (is.na(date_cutoffs$first_death)) stage1 <- data1
   else stage1 <- data1 %>% filter(dateRep < date_cutoffs$first_death)
@@ -406,9 +236,10 @@ create_stages_Provost <- function(data1,date_cutoffs, baseline){
       # when we take the log10 of deaths.
       
         #count the number of records that have 0 in the death series for stage 3  
-        count_zeros <- length(stage3$deaths[stage3$deaths==0])
+        #count_zeros <- length(stage3$deaths[stage3$deaths==0])
         
-        stage4 <- data1 %>% filter(dateRep >= date_cutoffs$c_chart_signal + baseline + count_zeros)
+        #stage4 <- data1 %>% filter(dateRep >= date_cutoffs$c_chart_signal + baseline + count_zeros)
+        stage4 <- data1 %>% filter(dateRep > max(stage3$dateRep))
         
         if(nrow(stage4)> 0) {
           
@@ -443,7 +274,7 @@ make_location_data <- function(data,
                                buffer_days,
                                baseline,
                                start_date){
- 
+ browser()
   #create an object that will have data frames, dates of stages and the linear model fit
   #I can create data frames with 0 rows and dates of stages with NA values.   What about a 'null' linear model?
   data_results_list <- list()
