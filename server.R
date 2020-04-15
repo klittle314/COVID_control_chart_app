@@ -127,17 +127,17 @@ shinyServer(function(input, output, session) {
     
     #make a list that has a frame of the original data, a frame to construct the limit chart, and the linear model
     make_data <- reactive({
-        
+       
         location_use <- input$choose_location
         data1 <- display_data()
         buffer <- input$buffer
         baseline1 <- input$baseline_n
-        start_date1 <- input$start_date
+        start_date_user <- input$start_date
         list_use <- make_location_data(data=data1,
                                        location_name=location_use,
                                        buffer_days=buffer,
                                        baseline=baseline1,
-                                       start_date=start_date1)
+                                       start_date=start_date_user)
       
         return(list_use)
     })
