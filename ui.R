@@ -32,7 +32,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     span("Created by "),
                                     a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
 
-                                    span("updated 15 April 2020  9:00am CDT"),
+                                    span("updated 15 April 2020  3:30pm CDT"),
 
                                     br(), br(),
                                 
@@ -91,7 +91,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                       choices = c('US state-level NY Times data',
                                                   'Country-level ECDC data',
                                                   'User-uploaded data'),
-                                      selected = 'Country-level ECDC data'),
+                                      selected = 'US state-level NY Times data'),
                                     
                                     #drop down to select the Site Type
                                     # htmlOutput("selectSiteType"),
@@ -101,8 +101,8 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     selectInput(
                                         inputId  = 'choose_location',
                                         label    = h5("Choose location"),
-                                        choices  = sort(country_names),
-                                        selected = "United_States_of_America",
+                                        choices  = sort(state_names),
+                                        selected = "New York",
                                         width    = "100%"),
                                     
                                     #Numeric input for buffer
@@ -146,7 +146,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                               
                                     uiOutput("message"),  
                                     
-                                    plotOutput("control_chart",height="500px"),
+                                    plotOutput("control_chart",height="500px",width="750px"),
                                              
                                     downloadButton(outputId = 'download_chart',
                                                    label = 'Download Chart'),
@@ -160,7 +160,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                            h4("explanation goes here with parameters"),
                                            h6("linear fit parameters to log deaths"),
                                            textOutput("parameters"),
-                                           plotOutput("log_control_chart",height="300px"),
+                                           plotOutput("log_control_chart",height="500px", width="750px"),
                                            
                                   downloadButton(outputId = 'download_logchart',
                                                  label = 'Download Chart')

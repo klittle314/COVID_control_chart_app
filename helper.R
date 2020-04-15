@@ -344,18 +344,18 @@ make_location_data <- function(data,
                 
                 names(cchart_df)[5] <- "differences"
                 
-                AvgMR <- mean(abs(cchart_df$differences),na.rm=TRUE)
+                #AvgMR <- mean(abs(cchart_df$differences),na.rm=TRUE)
+                #use median moving range as interim fix for removing large ranges from initial fit and repeating calcs
+                MedMR <- median(abs(cchart_df$differences),na.rm=TRUE)
                 
-                cchart_df$UCL <- lm_out$fitted.values + 2.66*AvgMR
+                cchart_df$UCL <- lm_out$fitted.values + 3.14*MedMR
                 
-                cchart_df$LCL <- lm_out$fitted.values - 2.66*AvgMR
+                cchart_df$LCL <- lm_out$fitted.values - 3.14*MedMR
                 
                 cchart_df$stage_data <- df1_X_exp_fit[!is.na(df1_X_exp_fit$log_10_deaths),] %>% pull(stage_data)
                 
-              
                 df_exp_fit <- cchart_df
                 
-              
               #check for any values in stage 4; compute them
               
               if(any(df1_X$stage_data=='Observations after exponential limits established')) {
@@ -380,8 +380,8 @@ make_location_data <- function(data,
                                                   rep(NA,nrows_post_fit),
                                                   rep(NA,nrows_post_fit),
                                                   check_predicted_value,
-                                                  check_predicted_value + 2.66*AvgMR,
-                                                  check_predicted_value - 2.66*AvgMR,
+                                                  check_predicted_value + 3.14*MedMR,
+                                                  check_predicted_value - 3.14*MedMR,
                                                   stage_data,stringsAsFactors=FALSE)
                  
                  names(df_post_fit_out) <- names(df_exp_fit)
@@ -406,8 +406,8 @@ make_location_data <- function(data,
                                               rep(NA,buffer_days),
                                               rep(NA,buffer_days),
                                               predicted_value,
-                                              predicted_value + 2.66*AvgMR,
-                                              predicted_value - 2.66*AvgMR,
+                                              predicted_value + 3.14*MedMR,
+                                              predicted_value - 3.14*MedMR,
                                               rep(NA,buffer_days))
                 
                 names(buffer_df) <- names(df_exp_fit)
@@ -476,17 +476,22 @@ make_charts <- function(location_use,
   } else if(is.na(exp_growth_date)) { #if there is no exponential growth, define plots we can make
     
     index_Provost <- min(which(cumsum(replace_na(df_no_fit$deaths,0)) >=8),na.rm=TRUE)
-    
+   
         if(nrow(df_no_fit) < index_Provost) {
           #p_out1 is simple plot of points in time order, p_out2 is empty list
           p_out1 <- ggplot(data=df_no_fit,
                            aes(x=dateRep,y=deaths))+
             theme_bw()+
-            geom_point()+
+            geom_point(size=rel(2.5))+
             labs(title = title1)+
+            theme(plot.title=element_text(size=rel(1.5)))+
             xlab("")+
-            theme(axis.title.y=element_text(size=rel(1),angle=0,vjust=0.5))+
-            scale_y_continuous(breaks = integer_breaks())
+            ylab("")+
+            #theme(axis.title.y=element_text(size=rel(1),angle=0,vjust=0.5))+
+            theme(axis.text.y=element_text(size=rel(1.5)))+
+            theme(axis.text.x=element_text(size=rel(1.5)))+
+            scale_y_continuous(breaks = integer_breaks(),limits=c(0,2*max(df_no_fit$deaths,na.rm=TRUE)))
+            
             
           
           p_out2 <- list()
@@ -501,11 +506,15 @@ make_charts <- function(location_use,
                             labs(title = title1,
                                  subtitle = "c-chart center line (solid) and upper limit (dashed)",
                                  caption = caption_use)+
+                            theme(plot.title=element_text(size=rel(1.5)))+
                             xlab("")+
-                            theme(axis.title.y=element_text(size=rel(1),angle=0,vjust=0.5))+
+                            ylab("")+
+                            #theme(axis.title.y=element_text(size=rel(1),angle=0,vjust=0.5))+
+                            theme(axis.text.y=element_text(size=rel(1.5)))+
+                            theme(axis.text.x=element_text(size=rel(1.5)))+
                             geom_hline(yintercept=c_chart_CL)+
                             geom_hline(yintercept=c_chart_UCL,linetype="dashed")+
-                            scale_y_continuous(breaks = integer_breaks())
+                            scale_y_continuous(breaks = integer_breaks(),limits=c(0,2*max(df_no_fit$deaths,na.rm=TRUE)))
                             
         
                 p_out2 <- list()
@@ -521,11 +530,19 @@ make_charts <- function(location_use,
             geom_line()+
             labs(title = title1,
                  subtitle = "c-chart center line (solid) and upper limit (dashed)",
-                 caption = caption_use)+
+                 caption = caption_use,
+                 shape = "Data stage")+
+            theme(plot.title=element_text(size=rel(1.5)))+
+            xlab("")+
+            ylab("")+
             geom_hline(yintercept=c_chart_CL)+
             geom_hline(yintercept=c_chart_UCL,linetype="dashed")+
-            theme(axis.title.y=element_text(size=rel(1),angle=0,vjust=0.5))+
-            scale_y_continuous(breaks = integer_breaks())
+            #theme(axis.title.y=element_text(size=rel(1),angle=0,vjust=0.5))+
+            theme(axis.text.y=element_text(size=rel(1.5)))+
+            theme(axis.text.x=element_text(size=rel(1.5)))+
+            scale_y_continuous(breaks = integer_breaks(),limits=c(0,2*max(df_no_fit$deaths,na.rm=TRUE)))+
+            theme(legend.position = c(0.05, 0.95),
+                  legend.justification = c("left", "top"))
           
           p_out2 <- list()
           
@@ -542,19 +559,23 @@ make_charts <- function(location_use,
                 geom_point(size=rel(3.0))+
                 geom_line()+
                 labs(title = title1,
-                     subtitle = "c-chart center line (solid) and upper limit (dashed);
-                                daily deaths after special cause signal do not show exponential growth",
+                     subtitle = "c-chart center line (solid) and upper limit (dashed);daily deaths after special cause signal do not show exponential growth",
                      caption = caption_use)+
-                theme(axis.title.y=element_text(size=rel(1),angle=0,vjust=0.5))+
+                theme(plot.title=element_text(size=rel(1.5)))+
+                #theme(axis.title.y=element_text(size=rel(1),angle=0,vjust=0.5))+
                 xlab("")+
+                ylab("")+
+                theme(axis.text.y=element_text(size=rel(1.5)))+
+                theme(axis.text.x=element_text(size=rel(1.5)))+
                 geom_hline(yintercept=c_chart_CL)+
                 geom_hline(yintercept=c_chart_UCL,linetype="dashed")+
-                scale_y_continuous(breaks = integer_breaks())
+                scale_y_continuous(breaks = integer_breaks(),limits=c(0,2*max(df_no_fit$deaths,na.rm=TRUE)))
                 
           
           p_out2 <- list()
           
           message_out <- "c-chart plus values after initial signal, no sign of exponential growth"
+          
   } else {
         #exponential plots
         p0 <- ggplot(data=df_fit,aes(x=dateRep,y=deaths,shape=stage_data))+
@@ -562,14 +583,16 @@ make_charts <- function(location_use,
           geom_point(size=rel(3.0),colour="blue")+
           geom_line()+
           labs(title=title1, 
-               caption = caption_use) +
+               caption = caption_use,
+               shape = "Data stage") +
           xlab("")+
-          ylab("Deaths per day")+
+          ylab("")+
+          #ylab("Deaths per day")+
           # xlim(min(df_fit$dateRep),max(df_fit$dateRep)+buffer)+
           theme(axis.text.x=element_text(size=rel(1.5)))+
           theme(axis.text.y=element_text(size=rel(1.5)))+
           theme(axis.title.x=element_text(size=rel(1)))+
-          theme(axis.title.y=element_text(size=rel(1),angle=0,vjust=0.5))+
+          #theme(axis.title.y=element_text(size=rel(1),angle=0,vjust=0.5))+
           theme(title=element_text(size=rel(1.5))) +
           theme(plot.caption = element_text(hjust = 0))
         
@@ -591,12 +614,15 @@ make_charts <- function(location_use,
                                      aes(x=dateRep,y=deaths,shape=stage_data))+
           geom_segment(aes(x=start_date, xend=end_date, y=c_chart_CL, yend=c_chart_CL))+
           geom_segment(aes(x=start_date, xend=end_date, y=c_chart_UCL, yend=c_chart_UCL),linetype="dashed")+
-          xlim(min(df_no_fit$dateRep),max(df_fit$dateRep))
+          xlim(min(df_no_fit$dateRep),max(df_fit$dateRep))+
+          theme(legend.position = c(0.05, 0.95),
+                legend.justification = c("left", "top")) #,
+                #legend.margin = margin())
         
         
         if (constrain_y_axis) {
           p_out1 <- p_out1 + scale_y_continuous(
-            limits = c(0, max(df_fit$deaths, na.rm = TRUE))
+            limits = c(0, 2*max(df_fit$deaths, na.rm = TRUE))
           )
         }   
         
@@ -608,16 +634,22 @@ make_charts <- function(location_use,
           
           geom_line(data=df_fit,aes(x=dateRep,y=lm_out.fitted.values))+
           geom_line(data=df_fit,aes(x=dateRep,y=UCL),linetype="dotted")+
-          geom_line(data=df_fit,aes(x=dateRep,y=LCL),linetype="dotted")
+          geom_line(data=df_fit,aes(x=dateRep,y=LCL),linetype="dotted") +
         
-        p_out2 <- p_out2 + geom_point(size=rel(2.5),colour="blue")+
+          geom_point(size=rel(2.5),colour="blue")+
           geom_line()+
-          labs(title=paste0(location_use," Log10 Daily Reported Deaths"),
-               subtitle="Limits based on Individuals Shewhart chart calculations using regression residuals")+
-          ylab("Log10(Deaths)")+
+          labs(title = paste0(location_use," Log10 Daily Reported Deaths"),
+               subtitle = "Limits based on Individuals Shewhart chart calculations using regression residuals",
+               shape = "Data stage")+
+          ylab("")+
           xlab("")+
-          theme(axis.title.y=element_text(angle=0,vjust=0.5))+
-          scale_shape_discrete(na.translate=FALSE)
+          theme(axis.text.x=element_text(size=rel(1.5)))+
+          theme(axis.text.y=element_text(size=rel(1.5)))+
+          theme(title=element_text(size=rel(1.5))) +
+          #theme(axis.title.y=element_text(angle=0,vjust=0.5))+
+          scale_shape_discrete(na.translate=FALSE)+
+          theme(legend.position = c(0.05, 0.95),
+                legend.justification = c("left", "top"))
         
         message_out <- "c-chart and exponential fit"
       }
