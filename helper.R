@@ -183,7 +183,7 @@ find_start_date_Provost <- function(data,
 #new function to label stages, MDEC created 4-7-2020 and modified to accept Provost starting rule
 create_stages_Provost <- function(data1,date_cutoffs, baseline){
   data_stages <- list()
-  browser()
+ 
   # if date_cutoffs$first_death is NA (no deaths), stage1 is the whole data.frame 
   if (is.na(date_cutoffs$first_death)) stage1 <- data1
   else stage1 <- data1 %>% filter(dateRep < date_cutoffs$first_death)
@@ -274,7 +274,7 @@ make_location_data <- function(data,
                                buffer_days,
                                baseline,
                                start_date){
- browser()
+ 
   #create an object that will have data frames, dates of stages and the linear model fit
   #I can create data frames with 0 rows and dates of stages with NA values.   What about a 'null' linear model?
   data_results_list <- list()
