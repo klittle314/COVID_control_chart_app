@@ -476,7 +476,7 @@ make_charts <- function(location_use,
   } else if(is.na(exp_growth_date)) { #if there is no exponential growth, define plots we can make
     
     index_Provost <- min(which(cumsum(replace_na(df_no_fit$deaths,0)) >=8),na.rm=TRUE)
-   browser()
+  
         if(nrow(df_no_fit) < index_Provost) {
           #p_out1 is simple plot of points in time order, p_out2 is empty list
           p_out1 <- ggplot(data=df_no_fit,
