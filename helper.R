@@ -54,7 +54,7 @@ index_test <- function(x,
 find_start_date_Provost <- function(data,
                                     location_name,
                                     start_date=start_date){
-  
+ 
   
   df1_X <- data %>% filter(countriesAndTerritories == location_name) %>% arrange(dateRep)
   
@@ -461,7 +461,7 @@ make_charts <- function(location_use,
   #    else #there is a c-chart signal
   #           if(too few points for expo fit)
   #             {add expo phase points to c-chart}
-  #           else if(slope is negative)
+  #           else if(95% CI for slope contains 0 or any negative values)
   #             {add expo phase points to c-chart and label:  no sign of expo growth after c-chart special cause}
   #           else #we can fit the exponential and overlay c-chart
   #             {make exponential charts}
@@ -476,7 +476,7 @@ make_charts <- function(location_use,
   } else if(is.na(exp_growth_date)) { #if there is no exponential growth, define plots we can make
     
     index_Provost <- min(which(cumsum(replace_na(df_no_fit$deaths,0)) >=8),na.rm=TRUE)
-   
+   browser()
         if(nrow(df_no_fit) < index_Provost) {
           #p_out1 is simple plot of points in time order, p_out2 is empty list
           p_out1 <- ggplot(data=df_no_fit,
@@ -487,6 +487,7 @@ make_charts <- function(location_use,
             theme(plot.title=element_text(size=rel(1.5)))+
             xlab("")+
             ylab("")+
+            xlim(as.Date(NA),max(df_no_fit$dateRep)+buffer)+
             #theme(axis.title.y=element_text(size=rel(1),angle=0,vjust=0.5))+
             theme(axis.text.y=element_text(size=rel(1.5)))+
             theme(axis.text.x=element_text(size=rel(1.5)))+
@@ -509,6 +510,7 @@ make_charts <- function(location_use,
                             theme(plot.title=element_text(size=rel(1.5)))+
                             xlab("")+
                             ylab("")+
+                            xlim(as.Date(NA),max(df_no_fit$dateRep)+buffer)+
                             #theme(axis.title.y=element_text(size=rel(1),angle=0,vjust=0.5))+
                             theme(axis.text.y=element_text(size=rel(1.5)))+
                             theme(axis.text.x=element_text(size=rel(1.5)))+
@@ -535,6 +537,7 @@ make_charts <- function(location_use,
             theme(plot.title=element_text(size=rel(1.5)))+
             xlab("")+
             ylab("")+
+            xlim(as.Date(NA),max(df_no_fit$dateRep)+buffer)+
             geom_hline(yintercept=c_chart_CL)+
             geom_hline(yintercept=c_chart_UCL,linetype="dashed")+
             #theme(axis.title.y=element_text(size=rel(1),angle=0,vjust=0.5))+
@@ -559,12 +562,13 @@ make_charts <- function(location_use,
                 geom_point(size=rel(3.0))+
                 geom_line()+
                 labs(title = title1,
-                     subtitle = "c-chart center line (solid) and upper limit (dashed);daily deaths after special cause signal do not show exponential growth",
+                     subtitle = "c-chart center line (solid) and upper limit (dashed);daily deaths after first special cause signal do not show exponential growth",
                      caption = caption_use)+
                 theme(plot.title=element_text(size=rel(1.5)))+
                 #theme(axis.title.y=element_text(size=rel(1),angle=0,vjust=0.5))+
                 xlab("")+
                 ylab("")+
+                xlim(as.Date(NA),max(df_no_fit$dateRep)+buffer)+
                 theme(axis.text.y=element_text(size=rel(1.5)))+
                 theme(axis.text.x=element_text(size=rel(1.5)))+
                 geom_hline(yintercept=c_chart_CL)+
