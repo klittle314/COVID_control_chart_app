@@ -74,7 +74,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                      uiOutput('upload_message'),
                      
                      uiOutput('upload_confirm')
-                     
+                  
                    ),
                    
                    tabPanel("Display",
@@ -102,7 +102,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                         inputId  = 'choose_location',
                                         label    = h5("Choose location"),
                                         choices  = sort(state_names),
-                                        selected = "New York",
+                                        selected = "Guam",
                                         width    = "100%"),
                                     
                                     #Numeric input for buffer
@@ -144,31 +144,39 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                   tabsetPanel(id = 'display-tab',type='tabs',  
                                     tabPanel("Basic Chart",
                                               
-                                    uiOutput("message"),  
-                                    
-                                    plotOutput("control_chart",height="500px",width="750px"),
-                                             
-                                    downloadButton(outputId = 'download_chart',
-                                                   label = 'Download Chart'),
-                                    
-                                    tags$hr(),
-                                    
-                                   
-                                    DT::dataTableOutput('data_table')
+                                            uiOutput("message"),  
+                                            
+                                            plotOutput("control_chart",height="500px",width="750px"),
+                                                     
+                                            downloadButton(outputId = 'download_chart',
+                                                           label = 'Download Chart'),
+                                            
+                                            tags$hr(),
+                                            
+                                           
+                                            DT::dataTableOutput('data_table')
                                     ),
-                                  tabPanel("Calculation Details",
+                                  
+                                    tabPanel("Log chart",
+                                    
+                                             plotOutput("log_control_chart",height="500px", width="750px"),
+                                             
+                                             downloadButton(outputId = 'download_logchart',
+                                                            label = 'Download Chart')
+                                     ),
+                                    
+                                    tabPanel("Calculation Details",
                                            h4("explanation goes here with parameters"),
+                                           
                                            h6("linear fit parameters to log deaths"),
-                                           textOutput("parameters"),
-                                           plotOutput("log_control_chart",height="500px", width="750px"),
                                            
-                                  downloadButton(outputId = 'download_logchart',
-                                                 label = 'Download Chart')
-                                           
+                                           textOutput("parameters")
                                     )
+                                           
                                   )
                                 )
+                              )
                             )
-                   )
+                   
             )
 )
