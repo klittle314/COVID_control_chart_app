@@ -75,7 +75,8 @@ shinyServer(function(input, output, session) {
                 tags$br(),
                 
                 h4('Data successfully added. Switch to Display tab to view.'))
-        })
+          
+        }) 
     })
     
     observeEvent(input$reset, {
@@ -91,7 +92,7 @@ shinyServer(function(input, output, session) {
     
     display_data <- reactive({
         req(input$data_source)
-        
+      
         if (input$data_source == 'Country-level ECDC data')           df_country
         else if (input$data_source == 'US state-level NY Times data') df_state
         else if (input$data_source == 'User-uploaded data')           isolate(df_upload())
@@ -145,7 +146,7 @@ shinyServer(function(input, output, session) {
     
     #Note do not use req(make_data()) as all of the values could be NULL or NA.
     #Revision of the construction of the charts
-control_chartNEW <- reactive({
+    control_chartNEW <- reactive({
       location_use <- input$choose_location
       buffer <- input$buffer
       baseline1 <- input$baseline_n
@@ -173,22 +174,21 @@ control_chartNEW <- reactive({
     
    
     output$control_chart <- renderPlot({
-        #FIX REQUIRED 4/2/2020
-        #put conditional test:  plot just the data and message about short series, object control_chart()[[1]]
-        #if series OK, then display control_chart()[[2]]
-        #if no data, print message
+        
         req(control_chartNEW())
+        
         if(control_chartNEW()$message_out != "No reported deaths") {
               print(control_chartNEW()$p_out1)
         }
     })
     
     output$log_control_chart <- renderPlot({
-        #FIX REQUIRED 4/2/2020
-        #put conditional test:  plot just the data and message about short series, object control_chart()[[1]]
-        #if series OK, then display control_chart()[[2]]
-        #if no data, print message
-        print(control_chartNEW()$p_out2)
+        
+        req(control_chartNEW())
+      
+        if(control_chartNEW()$message_out == "c-chart and exponential fit") {
+              print(control_chartNEW()$p_out2)
+        }
     })
     
     output$download_chart <- downloadHandler(
