@@ -284,6 +284,22 @@ shinyServer(function(input, output, session) {
       }
     )
     
+    output$log_chart_tab <- renderUI({
+      req(control_chartNEW()$message_out)
+      
+      if (control_chartNEW()$message_out == 'c-chart and exponential fit') {
+        list(
+          plotOutput("log_control_chart",height="500px", width="750px"),
+          
+          downloadButton(outputId = 'download_logchart',
+                         label = 'Download Chart')
+        )
+      } else {
+        h5('Not enough data to display log chart.')
+      }
+      
+    })
+    
  })
 
 

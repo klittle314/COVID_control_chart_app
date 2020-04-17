@@ -163,12 +163,10 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     ),
                                   
                                     tabPanel("Log chart",
-                                    
-                                             plotOutput("log_control_chart",height="500px", width="750px"),
                                              
-                                             downloadButton(outputId = 'download_logchart',
-                                                            label = 'Download Chart')
-                                     ),
+                                             uiOutput('log_chart_tab')
+                                             
+                                    ),
                                     
                                     tabPanel("Calculation Details",
                                            h4("explanation goes here with parameters"),
