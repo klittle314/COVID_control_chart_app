@@ -19,7 +19,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                 
                                 helpText("Disclaimer:  App under construction, use with caution"),
 
-                                helpText("attributes of graphs and calculations need formatting effort"),
+                                helpText("Calculation Details table still under construction"),
 
 
                                 helpText("Questions? Contact Kevin Little, Ph.D."),
@@ -32,7 +32,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     span("Created by "),
                                     a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
 
-                                    span("updated 15 April 2020  10:00pm CDT"),
+                                    span("updated 17 April 2020  2:45pm CDT"),
 
                                     br(), br()
                                 
@@ -150,7 +150,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                   tabsetPanel(id = 'display-tab',type='tabs',  
                                     tabPanel("Basic Chart",
                                               
-                                            uiOutput("message"),  
+                                           uiOutput("message"),  
                                             
                                             plotOutput("control_chart",height="500px",width="750px"),
                                                      
@@ -170,11 +170,16 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     ),
                                     
                                     tabPanel("Calculation Details",
-                                           h4("explanation goes here with parameters"),
+                                             
+                                             uiOutput("message2"),
+                                             
+                                             h6("Parameter values: format work pending"),
                                            
-                                           h6("linear fit parameters to log deaths"),
+                                          
                                            
-                                           textOutput("parameters")
+                                           DT::dataTableOutput('parameter_table')
+                                           
+                                           
                                     )
                                            
                                   )
