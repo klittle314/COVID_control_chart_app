@@ -115,7 +115,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     
                                     checkboxInput(
                                       inputId = 'show_advanced_controls',
-                                      label   = h5('Show Show options to change default settings for chart construction and display')),
+                                      label   = h5('Show options to change default settings for chart construction and display')),
                                     
                                     conditionalPanel('input.show_advanced_controls',
                                       #Numeric input for buffer
