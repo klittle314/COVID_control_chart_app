@@ -19,7 +19,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                 
                                 helpText("Disclaimer:  App under construction, use with caution"),
 
-                                helpText("Calculation Details table still under construction"),
+                                helpText("Calculation Details table format under review"),
 
 
                                 helpText("Questions? Contact Kevin Little, Ph.D."),
@@ -32,7 +32,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     span("Created by "),
                                     a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
 
-                                    span("updated 17 April 2020  2:45pm CDT"),
+                                    span("updated 17 April 2020  6:45pm CDT"),
 
                                     br(), br()
                                 
