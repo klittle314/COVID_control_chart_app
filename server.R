@@ -38,7 +38,7 @@ shinyServer(function(input, output, session) {
             
         } else if (any(is.na(as.Date(upload_data()$date, format='%m/%d/%Y')))) {
             
-            msg <- 'Some dates are not in MM/DD/YYYY format - please revise file to use MM/DD/YYYY format for all dates.'
+            msg <- 'Please confirm date format is MM/DD/YYYY'
           
             upload_confirm <- NULL
           
