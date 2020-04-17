@@ -245,12 +245,42 @@ shinyServer(function(input, output, session) {
          h4(control_chartNEW()$message_out)
     })
        
-   
+   output$message2 <- renderUI({
+        h4(control_chartNEW()$message_out)
+   })
      
     output$data_table <- DT::renderDataTable({
         req(data_for_table())
        
       DT::datatable(data_for_table(),
+                    rownames=FALSE)
+    })
+    
+    parameters_for_table <- reactive({
+      req(make_data())
+      # df_no_fit <- make_data()$df1_X
+      # df_fit <- make_data()$df_exp_fit
+      # lm_fit <- make_data()$lm_out
+      # first_death_date <- make_data()$date_cutoffs$first_death
+      # exp_growth_date <- make_data()$date_cutoffs$c_chart_signal
+      # c_chart_CL <- make_data()$date_cutoffs$CL
+      # c_chart_UCL <- make_data()$date_cutoffs$UCL
+      count_rows_fit <- nrow(make_data()$df1_X %>% filter(stage_data == "Exponential growth and fit"))
+      
+      df_out <- make_computation_table(nobs_raw=nrow(make_data()$df1_X),
+                                       nobs_fit=nrow(make_data()$df_exp_fit),
+                                       first_death_date=make_data()$date_cutoffs$first_death,
+                                       c_chart_signal=make_data()$date_cutoffs$c_chart_signal,
+                                       lm_fit=make_data()$lm_out,
+                                       baseline_fit=min(input$baseline_n,count_rows_fit,na.rm=TRUE))
+      
+      
+    })
+    
+    output$parameter_table <- DT::renderDataTable({
+      req(parameters_for_table())
+      
+      DT::datatable(parameters_for_table(),
                     rownames=FALSE)
     })
     
