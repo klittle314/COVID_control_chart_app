@@ -105,9 +105,17 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                         selected = "New York",
                                         width    = "100%"),
                                     
+                                    textAreaInput(
+                                      inputId = 'chart_caption',
+                                      label   = h5('Add caption to chart to comment on the data quality or implications'),
+                                      value   = '',
+                                      width   = '100%'),
+                                    
+                                    helpText(h6("Caption will be included in the downloaded image of the chart.")),
+                                    
                                     checkboxInput(
                                       inputId = 'show_advanced_controls',
-                                      label   = h5('Show advanced controls')),
+                                      label   = h5('Show Show options to change default settings for chart construction and display')),
                                     
                                     conditionalPanel('input.show_advanced_controls',
                                       #Numeric input for buffer
@@ -135,14 +143,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                       #helpText(h6("The starting date 2019-12-31 tells the app to use all the available data.")),
                                       helpText(h6("You can choose a date after start of the series to focus the graph and calculations on a shorter date range.")),
                                      
-                                     actionButton("reset", "Reset Defaults"),
-                                     
-                                      textAreaInput(
-                                        inputId = 'chart_caption',
-                                        label   = h5('Add caption to chart to comment on the data quality or implications'),
-                                        value   = '',
-                                        width   = '100%'),
-                                     helpText(h6("Caption will be included in the downloaded image of the chart."))
+                                     actionButton("reset", "Reset Defaults")
                                     )
                                 ),
                                 mainPanel(
