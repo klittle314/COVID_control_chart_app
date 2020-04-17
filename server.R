@@ -25,16 +25,26 @@ shinyServer(function(input, output, session) {
     upload_message <- reactive({
         if ('try-error' %in% class(upload_data())) {
             
-            'There was a problem reading your file. Please confirm that it is in CSV format, and that you selected the correct file.'
+            msg <- 'There was a problem reading your file. Please confirm that it is in CSV format, and that you selected the correct file.'
+          
+            upload_confirm <- NULL
             
         } else if (!all(c('date', 'cases', 'deaths', 'location') %in% colnames(upload_data()))) {
             
             missing_cols <- setdiff(c('date', 'cases', 'deaths', 'location'), colnames(upload_data()))
-            paste0('Columns missing from CSV file: ', paste0(missing_cols, collapse = ', '))
+            msg <- paste0('Columns missing from CSV file: ', paste0(missing_cols, collapse = ', '))
             
+            upload_confirm <- NULL
+            
+        } else if (any(is.na(as.Date(upload_data()$date, format='%m/%d/%Y')))) {
+            
+            msg <- 'Some dates are not in MM/DD/YYYY format - please revise file to use MM/DD/YYYY format for all dates.'
+          
+            upload_confirm <- NULL
+          
         } else {
             
-            output$upload_confirm <- renderUI({
+            upload_confirm <- renderUI({
                 
                 list(
                     tags$br(),
@@ -50,8 +60,12 @@ shinyServer(function(input, output, session) {
                         label   = 'Confirm'))
             })
             
-            'Data successfully uploaded and parsed.'
+            msg <- 'Data successfully uploaded and parsed.'
         }
+      
+        output$upload_confirm <- upload_confirm
+      
+        msg
     })
     
     output$upload_message <- renderUI({
