@@ -256,6 +256,7 @@ shinyServer(function(input, output, session) {
                     rownames=FALSE)
     })
     
+   
     parameters_for_table <- reactive({
       req(make_data())
       # df_no_fit <- make_data()$df1_X
