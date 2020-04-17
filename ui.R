@@ -102,7 +102,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                         inputId  = 'choose_location',
                                         label    = h5("Choose location"),
                                         choices  = sort(state_names),
-                                        selected = "Guam",
+                                        selected = "New York",
                                         width    = "100%"),
                                     
                                     #Numeric input for buffer
