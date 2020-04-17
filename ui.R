@@ -34,7 +34,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
 
                                     span("updated 15 April 2020  10:00pm CDT"),
 
-                                    br(), br(),
+                                    br(), br()
                                 
                                 ),
                                 
@@ -105,40 +105,46 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                         selected = "New York",
                                         width    = "100%"),
                                     
-                                    #Numeric input for buffer
-                                    # 
-                                    numericInput("buffer", label = h5("Days beyond end of data series: extend curve and limits"), value = defBuffer, min=1),
-                                    
-                                    #br(),
-                                    #Numeric input for baseline series length used to compute control limits
-                                    #The default value should be chosen by code:  requires at least 8 days no more than 20
-                                    numericInput("baseline_n", label = h5("Maximum days used to compute exponential growth line and limits"), value = defBaseline, min = 8),
-                                    helpText(h6("If there are fewer days in the data series than the maximum, app calculates using all the data.")),
-                                   #br(),
-                                    
-                                    # Checkbox that if checked, constrains control chart y-axis to the range of observed death counts, instead of the 
-                                    # range of the projections. Helps view data series for countries with enough data that projections dominate
-                                    # the observed series.
-                                    checkboxInput(
-                                      inputId = 'constrain_y_axis',
-                                      label   = h5('Constrain y-axis limits to observed data (instead of projections)'),
-                                      value   = TRUE),
-                                    
-                                    #Input date that marks the start of the limit calculations
-                                    dateInput("start_date",label=h5("Custom start date for calculations instead of date of first death"),value=defStartdate),
-                                    helpText(h6("Leave blank to allow the start date to be determined as date of first reported death")),
-                                    #helpText(h6("The starting date 2019-12-31 tells the app to use all the available data.")),
-                                    helpText(h6("You can choose a date after start of the series to focus the graph and calculations on a shorter date range.")),
-                                   
-                                   actionButton("reset", "Reset Defaults"),
-                                   
                                     textAreaInput(
                                       inputId = 'chart_caption',
                                       label   = h5('Add caption to chart to comment on the data quality or implications'),
                                       value   = '',
                                       width   = '100%'),
-                                   helpText(h6("Caption will be included in the downloaded image of the chart."))
                                     
+                                    helpText(h6("Caption will be included in the downloaded image of the chart.")),
+                                    
+                                    checkboxInput(
+                                      inputId = 'show_advanced_controls',
+                                      label   = h5('Show Show options to change default settings for chart construction and display')),
+                                    
+                                    conditionalPanel('input.show_advanced_controls',
+                                      #Numeric input for buffer
+                                      # 
+                                      numericInput("buffer", label = h5("Days beyond end of data series: extend curve and limits"), value = defBuffer, min=1),
+                                      
+                                      #br(),
+                                      #Numeric input for baseline series length used to compute control limits
+                                      #The default value should be chosen by code:  requires at least 8 days no more than 20
+                                      numericInput("baseline_n", label = h5("Maximum days used to compute exponential growth line and limits"), value = defBaseline, min = 8),
+                                      helpText(h6("If there are fewer days in the data series than the maximum, app calculates using all the data.")),
+                                     #br(),
+                                      
+                                      # Checkbox that if checked, constrains control chart y-axis to the range of observed death counts, instead of the 
+                                      # range of the projections. Helps view data series for countries with enough data that projections dominate
+                                      # the observed series.
+                                      checkboxInput(
+                                        inputId = 'constrain_y_axis',
+                                        label   = h5('Constrain y-axis limits to observed data (instead of projections)'),
+                                        value   = TRUE),
+                                      
+                                      #Input date that marks the start of the limit calculations
+                                      dateInput("start_date",label=h5("Custom start date for calculations instead of date of first death"),value=defStartdate),
+                                      helpText(h6("Leave blank to allow the start date to be determined as date of first reported death")),
+                                      #helpText(h6("The starting date 2019-12-31 tells the app to use all the available data.")),
+                                      helpText(h6("You can choose a date after start of the series to focus the graph and calculations on a shorter date range.")),
+                                     
+                                     actionButton("reset", "Reset Defaults")
+                                    )
                                 ),
                                 mainPanel(
                                   tabsetPanel(id = 'display-tab',type='tabs',  
@@ -158,12 +164,10 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     ),
                                   
                                     tabPanel("Log chart",
-                                    
-                                             plotOutput("log_control_chart",height="500px", width="750px"),
                                              
-                                             downloadButton(outputId = 'download_logchart',
-                                                            label = 'Download Chart')
-                                     ),
+                                             uiOutput('log_chart_tab')
+                                             
+                                    ),
                                     
                                     tabPanel("Calculation Details",
                                            h4("explanation goes here with parameters"),
