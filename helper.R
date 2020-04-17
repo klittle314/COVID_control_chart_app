@@ -661,3 +661,42 @@ make_charts <- function(location_use,
   return(list(message_out=message_out,p_out1=p_out1,p_out2=p_out2))
   
 }
+
+#create the computation table
+make_computation_table <- function(nobs_raw,
+                                   nobs_fit,
+                                   first_death_date,
+                                   c_chart_signal,
+                                   lm_fit,
+                                   baseline_fit)
+  # buffer,
+  #start_date_analysis,
+  #chart_message) 
+{
+  
+  #use the caption argument to title the table
+  #caption = 'Table 1: This is a simple caption for the table.'
+  lower_conf_value <- confint(lm_fit,'df1_X_exp_fit$serial_day')[1]
+  
+  parameter_names <- c("Observations since first reported death",
+                       "Date of first reported death",
+                       "Date of c-chart signal",
+                       "Number of records used to fit the regression",
+                       "Slope of log10 deaths vs day",
+                       "Intercept of log10 deaths vs day",
+                       "Lower limit of 95% CI for slope"
+  )
+  
+  parameter_values <- c(as.character(nobs_raw),
+                        as.character(first_death_date),
+                        as.character(c_chart_signal),
+                        as.character(baseline_fit),
+                        as.character(round(lm_fit$coefficients[2],3)),
+                        as.character(round(lm_fit$coefficients[1],3)),
+                        as.character(round(lower_conf_value,3)))
+  
+  df_out <- cbind.data.frame(parameter_names, parameter_values)
+  names(df_out) <- c("Parameter","Value")
+  return(df_out)
+  
+}
