@@ -673,11 +673,19 @@ make_computation_table <- function(nobs_raw,
   #start_date_analysis,
   #chart_message) 
 {
-  
+  if(length(lm_fit)==0){
+    intercept <- NA
+    slope <- NA
+    lower_conf_value <- NA
+  } else {
+    intercept <- lm_fit$coefficient[1]
+    slope <- lm_fit$coefficient[2]
+    lower_conf_value <- confint(lm_fit,'df1_X_exp_fit$serial_day')[1]
+  }
   #use the caption argument to title the table
   #caption = 'Table 1: This is a simple caption for the table.'
-  lower_conf_value <- confint(lm_fit,'df1_X_exp_fit$serial_day')[1]
   
+
   parameter_names <- c("Observations since first reported death",
                        "Date of first reported death",
                        "Date of c-chart signal",
@@ -691,8 +699,8 @@ make_computation_table <- function(nobs_raw,
                         as.character(first_death_date),
                         as.character(c_chart_signal),
                         as.character(baseline_fit),
-                        as.character(round(lm_fit$coefficients[2],3)),
-                        as.character(round(lm_fit$coefficients[1],3)),
+                        as.character(round(slope,3)),
+                        as.character(round(intercept,3)),
                         as.character(round(lower_conf_value,3)))
   
   df_out <- cbind.data.frame(parameter_names, parameter_values)
