@@ -55,7 +55,7 @@ find_start_date_Provost <- function(data,
                                     location_name,
                                     start_date=start_date){
  
-  
+ 
   df1_X <- data %>% filter(countriesAndTerritories == location_name) %>% arrange(dateRep)
   
   Rule_shift <- NA  
@@ -77,7 +77,7 @@ find_start_date_Provost <- function(data,
     
         start_date0 <- start_date_deaths
     
-      } else start_date0 <- max(start_date,start_date_deaths)
+      } else start_date0 <- as.Date(max(start_date,start_date_deaths, na.rm=TRUE), origin="1970-01-01")
     
     df1_X_deaths <- df1_X %>% filter(dateRep >= start_date0)
     
