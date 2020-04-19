@@ -185,11 +185,25 @@ create_stages_Provost <- function(data1,date_cutoffs, baseline){
   data_stages <- list()
  
   # if date_cutoffs$first_death is NA (no deaths), stage1 is the whole data.frame 
-  if (is.na(date_cutoffs$first_death)) stage1 <- data1
-  else stage1 <- data1 %>% filter(dateRep < date_cutoffs$first_death)
+  first_death_date <- date_cutoffs$first_death
   
-  stage1$stage <- 'Pre-deaths'
-  data_stages$stage1 <- stage1
+  # if (is.na(first_death_date)) stage1 <- data1
+  # else stage1 <- data1 %>% filter(dateRep < first_death_date)
+  # 
+  # stage1$stage <- 'Pre-deaths'
+  # data_stages$stage1 <- stage1
+  
+  if(!is.na(first_death_date)) {
+      if(first_death_date > min(data1$dateRep,na.rm=TRUE)) {
+          stage1 <- data1 %>% filter(dateRep < first_death_date)
+          stage1$stage <- 'Pre-deaths'
+          data_stages$stage1 <- stage1
+      }
+  } else {
+    stage1 <- data1
+    stage1$stage <- 'Pre-deaths'
+    data_stages$stage1 <- stage1
+  }
   
   # If there has been a death, stage 2 starts on the day of the first death,
   
