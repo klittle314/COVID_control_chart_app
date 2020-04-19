@@ -83,6 +83,7 @@ shinyServer(function(input, output, session) {
         data_add$dateRep <- as.Date(data_add$dateRep, format = '%m/%d/%Y')
         
         df_upload(data_add)
+       
         
         output$upload_confirm <- renderUI({
             list(
@@ -106,7 +107,7 @@ shinyServer(function(input, output, session) {
     
     display_data <- reactive({
         req(input$data_source)
-      
+     
         if (input$data_source == 'Country-level ECDC data')           df_country
         else if (input$data_source == 'US state-level NY Times data') df_state
         else if (input$data_source == 'User-uploaded data')           isolate(df_upload())
@@ -114,7 +115,7 @@ shinyServer(function(input, output, session) {
     
     observe({
         req(display_data()) 
-        
+      
         selected <- isolate(input$choose_location)
         choices  <- sort(unique(display_data()$countriesAndTerritories))
         
@@ -138,6 +139,7 @@ shinyServer(function(input, output, session) {
                 input$chart_caption,
                 data_source,
                 as.character(Sys.Date()))
+       
     })
     
     #make a list that has a frame of the original data, a frame to construct the limit chart, and the linear model
@@ -148,6 +150,7 @@ shinyServer(function(input, output, session) {
         buffer <- input$buffer
         baseline1 <- input$baseline_n
         start_date_user <- input$start_date
+        
         list_use <- make_location_data(data=data1,
                                        location_name=location_use,
                                        buffer_days=buffer,
