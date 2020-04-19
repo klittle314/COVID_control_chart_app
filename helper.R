@@ -12,7 +12,7 @@ nudge_zero <- function(x){
 
 #function to do NA conversion
 zero_NA <- function(x){
-  if(identical(x,0)){
+  if(x==0){
     x <- NA
   }
   return(x)
