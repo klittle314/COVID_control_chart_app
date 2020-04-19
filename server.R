@@ -84,7 +84,11 @@ shinyServer(function(input, output, session) {
         
         df_upload(data_add)
        
-        
+        updateSelectInput(
+          session = session,
+          inputId = 'data_source',
+          selected = 'User-uploaded data')
+
         output$upload_confirm <- renderUI({
             list(
                 tags$br(),
