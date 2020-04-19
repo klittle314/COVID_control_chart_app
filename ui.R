@@ -96,7 +96,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     #drop down to select the Site Type
                                     # htmlOutput("selectSiteType"),
                                     # br(),
-                                    
+                                  
                                     #drop down to select the location
                                     selectInput(
                                         inputId  = 'choose_location',
