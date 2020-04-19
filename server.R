@@ -82,6 +82,10 @@ shinyServer(function(input, output, session) {
         
         data_add$dateRep <- as.Date(data_add$dateRep, format = '%m/%d/%Y')
         
+        data_add <- rbind(isolate(df_upload()), data_add)
+        
+        data_add <- unique(data_add)
+        
         df_upload(data_add)
        
         updateSelectInput(
@@ -114,11 +118,11 @@ shinyServer(function(input, output, session) {
      
         if (input$data_source == 'Country-level ECDC data')           df_country
         else if (input$data_source == 'US state-level NY Times data') df_state
-        else if (input$data_source == 'User-uploaded data')           isolate(df_upload())
+        else if (input$data_source == 'User-uploaded data')           df_upload()
     })
     
     observe({
-        req(display_data()) 
+        req(display_data(), df_upload()) 
       
         selected <- isolate(input$choose_location)
         choices  <- sort(unique(display_data()$countriesAndTerritories))
