@@ -1,7 +1,7 @@
 # Provost Method:  Count plots across phases of COVID-19 infection
 Implementation of Provost control chart for exponential data
 
-This project implements a method based on control charts to view phases in daily reported deaths from COVID-19.  The code is R and deploys a user interface using Shiny technology.  The R code transforms a time series of daily reported deaths into charts that distinguish phases of COVID-19 infection for a reporting location like a country, state or city.   You can find a description of the method [here](http://www.ihi.org/Topics/COVID-19/Documents/IHI-COVID-19-Data-Dashboard-Introduction-and-Methodology.pdf) For an introduction to the application of the method, [here](https://www.usnews.com/news/healthiest-communities/articles/2020-03-26/coronavirus-pandemic-reaching-critical-tipping-point-in-america-analysis-shows) is an article from U.S. News and World Report
+This project implements a method based on control charts to view phases in daily reported deaths from COVID-19. The method was developed by Lloyd Provost, Shannon Provost, and Rocco Perla.  The code is R and deploys a user interface using Shiny technology.  The R code transforms a time series of daily reported deaths into charts that distinguish phases of COVID-19 infection for a reporting location like a country, state or city.   You can find a description of the method [here](http://www.ihi.org/Topics/COVID-19/Documents/IHI-COVID-19-Data-Dashboard-Introduction-and-Methodology.pdf) For an introduction to the application of the method, [here](https://www.usnews.com/news/healthiest-communities/articles/2020-03-26/coronavirus-pandemic-reaching-critical-tipping-point-in-america-analysis-shows) is an article from U.S. News and World Report
 
 ## Getting Started
 
@@ -98,3 +98,9 @@ We have not yet set up a process to incorporate changes into the code.   Check b
 
 ## Authors
 Kevin Little outlined the basic design and wrote most of the core functions; Mason DeCammillis built subtantial parts of the Shiny interface; Emily Jones contributed functionality and participated with Lynda Finn to suggest enhancements to the initial design.
+
+## Acknowledgements
+Lloyd Provost, Shannon Provost, Rocco Perla, and Gareth Parry reviewed this applications and offered corrections and guidance that have improved the design and function.
+
+## License
+This project is licensed under the MIT License -- see the LICENSE.md file for details.
