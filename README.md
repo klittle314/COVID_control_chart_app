@@ -1,7 +1,7 @@
 # Provost Method:  Count plots across phases of COVID-19 infection
 Implementation of Provost control chart for exponential data
-Add information about the use
-This project implements a method based on control charts to view phases in daily reported deaths from COVID-19.  The code is R and deploys a user interface using Shiny technology.
+
+This project implements a method based on control charts to view phases in daily reported deaths from COVID-19.  The code is R and deploys a user interface using Shiny technology.  The R code transforms a time series of daily reported deaths into charts that distinguish phases of COVID-19 infection for a reporting location like a country, state or city.   You can find a description of the method here INSERT IHI Link.
 
 ## Getting Started
 
@@ -52,11 +52,11 @@ The core files are
 2. ui.R  This file defines the Shiny user interface.
 3. server.R  This file provides the reactive functions that take default and user-defined inputs to create summary charts and tables.
 4. helper.R  This file contains the core functions.   In addition to several small auxiliary functions, the main functions are:
-- find_start_date_Provost  A function that determines dates for analysis based on data properties, along with c-chart parameters
+- find_start_date_Provost:  A function that determines dates for analysis based on data properties, along with c-chart parameters
     - Inputs:  input data frame, specified location, start date for analysis
     - Outputs: a list with date of first reported death, date of signal on c-control chart, center line for c-chart, upper control limit for c-chart 
 
-- create_stages_Provost  A function that will assign stage names to records in a data frame filtered by location name.
+- create_stages_Provost:  A function that will assign stage names to records in a data frame filtered by location name.
    - Inputs:  input data frame, the list of dates from find_start_date_Provost, and the baseline days used to fit the regression model of log10 deaths
    - Outputs: output data frame, with a new column that describes the stage for each record
        - stage 1:  data before the date of first reported death
@@ -64,17 +64,17 @@ The core files are
        - stage 3:  data starting with the date of a special cause signal on the c-control chart
        - stage 4:  data starting after the last day used to fit fit the regression model
             
-- make_location_data  A function that calls find_start_date_Provost function and create_stages_Provost to create data frames for plotting
+- make_location_data:  A function that calls find_start_date_Provost function and create_stages_Provost to create data frames for plotting
   - Inputs:  input data frame, specified location, buffer days at end of observed data, baseline days used to fit the regression model of log10 deaths, and start date for analysis
   - Outputs:  data frame for specified location dates, deaths, and stages; data frame with fitted values and limits dervied from the regression model of log10 deaths; list of date of first death, date of special cause signal on c-chart, c-chart center line and upper control limit, linear model list from the regression fit.
   
- - make_charts  A function that produces all the ggplot2 objects presented by the ui
-  - Inputs:  specified location, buffer days at end of observed data, output list from function make__location_data, title for the basic graph, caption for the basic graph, logical variable to determine whether the scale of the basic chart is constrained to twice the maximum of the data.
-  - Outputs:  a list containing a descriptive message about which plots are possible, a plot for the basic plot tab and a plot for the log chart page.
+ - make_charts:  A function that produces all the ggplot2 objects presented by the ui
+    - Inputs:  specified location, buffer days at end of observed data, output list from function make__location_data, title for the basic graph, caption for the basic graph, logical variable to determine whether the scale of the basic chart is constrained to twice the maximum of the data.
+    - Outputs:  a list containing a descriptive message about which plots are possible, a plot for the basic plot tab and a plot for the log chart page.
   
-   - make_computation_table   A function that produces the elements in the table presented on the calculation details tab
+ - make_computation_table:   A function that produces the elements in the table presented on the calculation details tab
      - Inputs:  number of observations in the original data file starting with first reported death, for the specific location; the number of observations used in the regression fit; date of the first reported death; date of special cause sigal on the c-chart; the linear model list produced by the function make_location_data; the baseline days used to fit the regression model of log10 deaths.
-  - Outputs: data frame used converted to an HTML table by renderDatatable.
+    - Outputs: data frame used converted to an HTML table by renderDatatable.
   
   
 ## Test file
