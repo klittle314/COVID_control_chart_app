@@ -51,6 +51,7 @@ End with an example of getting some data out of the system or using it for a lit
 
 You can use the data file in the test_data folder to check the upload data function.   You should get this output:
 
-![basic chart] (/screen_shots/2020-04-20_basic%20chart.jpg)
-![log chart] (/screen_shots/2020-04-20_log%20chart.jpg)
-![calculation details] (/screen_shots/2020-04-20_basic%20calculations.jpg)
+![basic chart] (https://github.com/klittle314/Provost_control_chart/blob/master/screen_shots/2020-04-20_basic%20chart.jpg)
+![log chart] (https://github.com/klittle314/Provost_control_chart/blob/master/screen_shots/2020-04-20_log%20chart.jpg)
+![calculation details] (https://github.com/klittle314/Provost_control_chart/blob/master/screen_shots/2020-04-20_basic%20calculations.jpg)
+
