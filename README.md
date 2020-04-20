@@ -9,9 +9,9 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-You need a current version of R (we developed this using R version 3.6.3 and RStudio version 1.2.5033).  We used the R package ggplot2 to construct the graphs; we are exploring using plotly as an alternative.  You also need familiarity with the Shiny package that enables the construction of the user-interface. You also need to be connected to the internet to enable update of data tables.
+You need a current version of R (we developed this using R version 3.6.3 and RStudio version 1.2.5033).  We used the R package ggplot2 to construct the graphs; we are exploring using plotly as an alternative.  You need familiarity with the Shiny package that builds the HTML webpages presented to the user. You need to be connected to the internet to enable update of the input data tables.
 
-The code looks for current data in the data folder; if data are not current, the code will attempt to connect to web sites to obtain current data:
+The code looks for current data in a local folder **data**; if data are not current, the code will attempt to connect to web sites to obtain current data:
 
 ```
 data_file_country <- paste0('data/country_data_', as.character(Sys.Date()), '.csv')
@@ -45,7 +45,6 @@ library(DT)
 
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
 
 ## Structure of the Shiny app
 The core files are
@@ -53,10 +52,11 @@ The core files are
 2. ui.R  This file defines the Shiny user interface.
 3. server.R  This file provides the reactive functions that take default and user-defined inputs to create summary charts and tables.
 4. helper.R  This file contains the core functions.   In addition to several small auxiliary functions, the main functions are:
-- find_start_date_Provost
+- find_start_date_Provost  A function that determines dates for analysis based on data properties, along with c-chart parameters
     - Inputs:  input data frame, specified location, start date for analysis
     - Outputs: a list with date of first reported death, date of signal on c-control chart, center line for c-chart, upper control limit for c-chart 
-- create_stages_Provost
+
+- create_stages_Provost  A function that will assign stage names to records in a data frame filtered by location name.
    - Inputs:  input data frame, the list of dates from find_start_date_Provost, and the baseline days used to fit the regression model of log10 deaths
    - Outputs: output data frame, with a new column that describes the stage for each record
        - stage 1:  data before the date of first reported death
@@ -64,9 +64,13 @@ The core files are
        - stage 3:  data starting with the date of a special cause signal on the c-control chart
        - stage 4:  data starting after the last day used to fit fit the regression model
             
-- make_location_data  A function that calls find_start_date_Provost function and create_stages_Provost
+- make_location_data  A function that calls find_start_date_Provost function and create_stages_Provost to create data frames for plotting
   - Inputs:  input data frame, specified location, buffer days at end of observed data, baseline days used to fit the regression model of log10 deaths, and start date for analysis
   - Outputs:  data frame for specified location dates, deaths, and stages; data frame with fitted values and limits dervied from the regression model of log10 deaths; list of date of first death, date of special cause signal on c-chart, c-chart center line and upper control limit, linear model list from the regression fit.
+  
+ -  make_charts  A function that produces all the ggplot2 objects presented by the ui
+   - Inputs:  specified location, buffer days at end of observed data, output list from function make__location_data, title for the basic graph, caption for the basic graph, logical variable to determine whether the scale of the basic chart is constrained to twice the maximum of the data.
+   -- Outputs:  a list containing a descriptive message about which plots are possible, a plot for the basic plot tab and a plot for the log chart page.
   
   
 ## Test file
