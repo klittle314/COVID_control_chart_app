@@ -1,7 +1,6 @@
-# Provost Method:  Count plots across phases of COVID-19 infection
-Implementation of Provost control chart for exponential data
+# Provost Method:  Create count plots across phases of COVID-19 infection history
 
-This project implements a method based on control charts to view phases in daily reported deaths from COVID-19. The method was developed by Lloyd Provost, Shannon Provost, and Rocco Perla.  The code is R and deploys a user interface using Shiny technology.  The R code transforms a time series of daily reported deaths into charts that distinguish phases of COVID-19 infection for a reporting location like a country, state or city.   You can find a description of the method [here](http://www.ihi.org/Topics/COVID-19/Documents/IHI-COVID-19-Data-Dashboard-Introduction-and-Methodology.pdf) For an introduction to the application of the method, [here](https://www.usnews.com/news/healthiest-communities/articles/2020-03-26/coronavirus-pandemic-reaching-critical-tipping-point-in-america-analysis-shows) is an article from U.S. News and World Report
+This project implements a method based on control charts to view phases in daily reported deaths from COVID-19. The method was developed by Lloyd Provost, Shannon Provost, and Rocco Perla.  The code is R and deploys a user interface using Shiny technology.  The R code transforms a time series of daily reported deaths into charts that distinguish phases of COVID-19 infection for a reporting location like a country, state or city.   You can find a description of the method [here](http://www.ihi.org/Topics/COVID-19/Documents/IHI-COVID-19-Data-Dashboard-Introduction-and-Methodology.pdf). For an introduction to the application of the method, [here](https://www.usnews.com/news/healthiest-communities/articles/2020-03-26/coronavirus-pandemic-reaching-critical-tipping-point-in-america-analysis-shows) is an article from U.S. News and World Report.
 
 ## Getting Started
 
@@ -30,7 +29,7 @@ if (!file.exists(data_file_state)) {
 }
 ```
 
-### Installing
+### Copying the code for local use
 
 [Click here to download the latest version] (https://github.com/klittle314/Provost_control_chart/archive/master.zip) 
 
@@ -44,7 +43,7 @@ library(httr)
 library(DT)
 
 ```
-
+Alternatively, if you understand how repositories work, you can fork the master branch for your use.
 
 ## Structure of the Shiny app
 The core files are
