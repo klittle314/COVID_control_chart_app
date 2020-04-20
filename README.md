@@ -31,7 +31,7 @@ if (!file.exists(data_file_state)) {
 
 ### Copying the code for local use
 
-[Click here to download the latest version] (https://github.com/klittle314/Provost_control_chart/archive/master.zip) 
+[Click here to download the latest version](https://github.com/klittle314/Provost_control_chart/archive/master.zip) 
 
 Make sure you have installed the following libraries and dependencies; these are shown at the top of the global.R file.  
 
