@@ -1,4 +1,4 @@
-# Provost_control_chart
+# Provost Method:  Count plots across phases of COVID-19 infection
 Implementation of Provost control chart for exponential data
 Add information about the use
 This project implements a method based on control charts to view phases in daily reported deaths from COVID-19.  The code is R and deploys a user interface using Shiny technology.
@@ -53,6 +53,17 @@ The core files are
 2. ui.R  This file defines the Shiny user interface.
 3. server.R  This file provides the reactive functions that take default and user-defined inputs to create summary charts and tables.
 4. helper.R  This file contains the core functions.   In addition to several small auxiliary functions, the main functions are:
+    - find_start_date_Provost
+    -- Inputs:  input data frame, specified location, start date for analysis
+    -- Outputs: a list with date of first reported death, date of signal on c-control chart, center line for c-chart, upper control limit for c-chart 
+    - create_stages_Provost
+    -- Inputs:  input data frame, the list of dates from find_start_date_Provost, and the baseline days used to fit the regression model of log10 deaths
+    -- Outputs: output data frame, with a new column that describes the stage for each record
+    --- stage 1:  data before the date of first reported death
+    --- stage 2:  data starting with date of first reported death through the day before a special cause signal on the c-control chart
+    --- stage 3:  data starting with the date of a special cause signal on the c-control chart
+    --- stage 4:  data starting after the last day used to fit fit the regression model
+            
 
 
 ## Test file
