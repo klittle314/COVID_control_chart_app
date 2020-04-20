@@ -49,9 +49,16 @@ End with an example of getting some data out of the system or using it for a lit
 
 ## Test file
 
-You can use the data file in the test_data folder to check the upload data function.   You should get this output:
+You can use the data file in the test_data folder to check the upload data function.   You should see screens like these:
+*Upload data*
+![upload data]
 
+*Basic Chart*
 ![basic chart](https://github.com/klittle314/Provost_control_chart/blob/master/screen_shots/2020-04-20_basic%20chart.jpg)
+
+*Log Chart*
 ![log chart](https://github.com/klittle314/Provost_control_chart/blob/master/screen_shots/2020-04-20_log%20chart.jpg)
+
+*Calculations*
 ![calculation details](https://github.com/klittle314/Provost_control_chart/blob/master/screen_shots/2020-04-20_basic%20calculations.jpg)
 
