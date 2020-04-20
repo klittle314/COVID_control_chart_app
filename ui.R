@@ -60,6 +60,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                      helpText('The current code will not yet handle NA values in the death series.  Zero values are fine.')
                      ),
                      
+                     
                      h5('Click',
                         tags$a('here', 
                                href = 'https://support.office.com/en-us/article/Import-or-export-text-txt-or-csv-files-5250ac4c-663c-47ce-937b-339e391393ba',
