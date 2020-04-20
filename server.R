@@ -60,7 +60,7 @@ shinyServer(function(input, output, session) {
                         label   = 'Confirm'))
             })
             
-            msg <- 'Data successfully uploaded and parsed.'
+            msg <- 'Data successfully uploaded and parsed. Scroll to bottom of table to click Confirm to complete the data entry.'
         }
       
         output$upload_confirm <- upload_confirm
@@ -343,5 +343,4 @@ shinyServer(function(input, output, session) {
     })
     
  })
-
 
