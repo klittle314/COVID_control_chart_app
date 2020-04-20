@@ -32,7 +32,7 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                                     span("Created by "),
                                     a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
 
-                                    span("updated 19 April 2020  6:45pm CDT"),
+                                    span("updated 19 April 2020  8:45pm CDT"),
 
                                     br(), br()
                                 
@@ -55,7 +55,9 @@ shinyUI(navbarPage("COVID-19 Control Chart Application",
                        tags$li('deaths'),
                        tags$li('location'),
                      br(),
-                     helpText('The current code will not handle NA values in the death series.  Zero values are fine.')
+                     helpText('You may include multiple locations in a single file; the locations will appear in the location drop-down box'),
+                
+                     helpText('The current code will not yet handle NA values in the death series.  Zero values are fine.')
                      ),
                      
                      h5('Click',
