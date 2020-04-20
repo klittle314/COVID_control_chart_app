@@ -47,11 +47,19 @@ library(DT)
 
 End with an example of getting some data out of the system or using it for a little demo
 
+## Structure of the Shiny app
+The core files are
+1. global.R  This file loads the data from external websites for country and U.S. state/territory COVID daily data.  It also does minimal editing of the data frames to assure common names.  For the U.S. state/territory file, it convets cumulative deaths into deaths reported daily.
+2. ui.R  This file defines the Shiny user interface.
+3. server.R  This file provides the reactive functions that take default and user-defined inputs to create summary charts and tables.
+4. helper.R  This file contains the core functions.   In addition to several small auxiliary functions, the main functions are:
+
+
 ## Test file
 
-You can use the data file in the test_data folder to check the upload data function.   You should see screens like these:
+You can use the data file in the test_data folder to check the upload data function. You should see screens like these:
 *Upload data*
-![upload data]
+![upload data](https://github.com/klittle314/Provost_control_chart/blob/master/screen_shots/2020-04-20_Data%20Load.jpg)
 
 *Basic Chart*
 ![basic chart](https://github.com/klittle314/Provost_control_chart/blob/master/screen_shots/2020-04-20_basic%20chart.jpg)
@@ -62,3 +70,8 @@ You can use the data file in the test_data folder to check the upload data funct
 *Calculations*
 ![calculation details](https://github.com/klittle314/Provost_control_chart/blob/master/screen_shots/2020-04-20_basic%20calculations.jpg)
 
+## Contributing
+We have not yet set up a process to incorporate changes into the code.   Check back soon!
+
+## Authors
+Kevin Little outlined the basic design and wrote most of the core functions; Mason DeCammillis built subtantial parts of the Shiny interface; Emily Jones contributed functionality and participated with Lynda Finn in design critique.
