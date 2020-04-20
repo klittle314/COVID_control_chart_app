@@ -59,10 +59,10 @@ The core files are
 - create_stages_Provost
    - Inputs:  input data frame, the list of dates from find_start_date_Provost, and the baseline days used to fit the regression model of log10 deaths
    - Outputs: output data frame, with a new column that describes the stage for each record
-    --- stage 1:  data before the date of first reported death
-    --- stage 2:  data starting with date of first reported death through the day before a special cause signal on the c-control chart
-    --- stage 3:  data starting with the date of a special cause signal on the c-control chart
-    --- stage 4:  data starting after the last day used to fit fit the regression model
+       - stage 1:  data before the date of first reported death
+       - stage 2:  data starting with date of first reported death through the day before a special cause signal on the c-control chart
+       - stage 3:  data starting with the date of a special cause signal on the c-control chart
+       - stage 4:  data starting after the last day used to fit fit the regression model
             
 
 
