@@ -53,9 +53,9 @@ The core files are
 2. ui.R  This file defines the Shiny user interface.
 3. server.R  This file provides the reactive functions that take default and user-defined inputs to create summary charts and tables.
 4. helper.R  This file contains the core functions.   In addition to several small auxiliary functions, the main functions are:
-    - find_start_date_Provost
-    -- Inputs:  input data frame, specified location, start date for analysis
-    -- Outputs: a list with date of first reported death, date of signal on c-control chart, center line for c-chart, upper control limit for c-chart 
+- find_start_date_Provost
+    -Inputs:  input data frame, specified location, start date for analysis
+   - Outputs: a list with date of first reported death, date of signal on c-control chart, center line for c-chart, upper control limit for c-chart 
     - create_stages_Provost
     -- Inputs:  input data frame, the list of dates from find_start_date_Provost, and the baseline days used to fit the regression model of log10 deaths
     -- Outputs: output data frame, with a new column that describes the stage for each record
