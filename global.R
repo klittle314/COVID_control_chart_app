@@ -14,7 +14,7 @@ data_file_state   <- paste0('data/us_state_data_', as.character(Sys.Date()), '.c
 
 defStartdate <- NA
 defBuffer <- 7
-#defBaseline is the defaulty value of points to use to compute the exponential growth control limits
+#defBaseline is the default value of points to use to compute the exponential growth control limits
 defBaseline <- 20
 
 if (!file.exists(data_file_country)) {
