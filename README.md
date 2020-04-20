@@ -78,7 +78,7 @@ The core files are
   
 ## Test file
 
-You can use the data file in the test_data folder to check the upload data function. You should see screens like these:
+You can use the data file in the test_data folder to check the upload data function. Click [here](https://github.com/klittle314/Provost_control_chart/blob/master/test_data/France_test1_resort_dates.csv) to examine the test data file.  You should see screens like these if you have successfully run the Shiny app and uploaded the test file:
 
 *Upload data*
 ![upload data](https://github.com/klittle314/Provost_control_chart/blob/master/screen_shots/2020-04-20_Data%20Load.jpg)
