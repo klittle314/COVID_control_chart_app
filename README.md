@@ -68,9 +68,13 @@ The core files are
   - Inputs:  input data frame, specified location, buffer days at end of observed data, baseline days used to fit the regression model of log10 deaths, and start date for analysis
   - Outputs:  data frame for specified location dates, deaths, and stages; data frame with fitted values and limits dervied from the regression model of log10 deaths; list of date of first death, date of special cause signal on c-chart, c-chart center line and upper control limit, linear model list from the regression fit.
   
- -  make_charts  A function that produces all the ggplot2 objects presented by the ui
-   - Inputs:  specified location, buffer days at end of observed data, output list from function make__location_data, title for the basic graph, caption for the basic graph, logical variable to determine whether the scale of the basic chart is constrained to twice the maximum of the data.
-   -- Outputs:  a list containing a descriptive message about which plots are possible, a plot for the basic plot tab and a plot for the log chart page.
+ - make_charts  A function that produces all the ggplot2 objects presented by the ui
+  - Inputs:  specified location, buffer days at end of observed data, output list from function make__location_data, title for the basic graph, caption for the basic graph, logical variable to determine whether the scale of the basic chart is constrained to twice the maximum of the data.
+  - Outputs:  a list containing a descriptive message about which plots are possible, a plot for the basic plot tab and a plot for the log chart page.
+  
+   - make_computation_table   A function that produces the elements in the table presented on the calculation details tab
+     - Inputs:  number of observations in the original data file starting with first reported death, for the specific location; the number of observations used in the regression fit; date of the first reported death; date of special cause sigal on the c-chart; the linear model list produced by the function make_location_data; the baseline days used to fit the regression model of log10 deaths.
+  - Outputs: data frame used converted to an HTML table by renderDatatable.
   
   
 ## Test file
