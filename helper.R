@@ -656,7 +656,7 @@ make_charts <- function(location_use,
         
           geom_point(size=rel(2.5),colour="blue")+
           geom_line()+
-          labs(title = paste0(location_use," Log10 Daily Reported Deaths"),
+          labs(title = paste0(location_use," log10 Daily Reported Deaths"),
                subtitle = "Limits based on Individuals Shewhart chart calculations using regression residuals",
                shape = "Data stage")+
           ylab("")+
