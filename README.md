@@ -2,6 +2,10 @@
 
 This project implements a method based on control charts to view phases in daily reported deaths from COVID-19. The method was developed by Lloyd Provost, Shannon Provost, and Rocco Perla.  The code is R and deploys a user interface using Shiny technology.  The R code transforms a time series of daily reported deaths into charts that distinguish phases of COVID-19 infection for a reporting location like a country, state or city.   You can find a description of the method [here](http://www.ihi.org/Topics/COVID-19/Documents/IHI-COVID-19-Data-Dashboard-Introduction-and-Methodology.pdf). For an introduction to the application of the method, [here](https://www.usnews.com/news/healthiest-communities/articles/2020-03-26/coronavirus-pandemic-reaching-critical-tipping-point-in-america-analysis-shows) is an article from U.S. News and World Report.
 
+## Who can use this project?
+
+People who have a basic understanding of Shewhart control charts and want to apply control chart methods to characterize how reported deaths from COVID-19 change over time.  People who have skills in R can modify the code to load other data sources than the built-in sources and to consider other measures, like hospializations or ICU cases.
+
 ## Getting Started
 
 This document describes the R code and what you need to run it yourself.  It provides sample output for you to check.
