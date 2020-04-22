@@ -49,7 +49,7 @@ library(DT)
 ```
 Alternatively, if you understand how repositories work, you can fork the master branch for your use.
 
-## Structure of the Shiny app
+### Structure of the Shiny app
 The core files are
 1. global.R  This file loads the data from external websites for country and U.S. state/territory COVID daily data.  It also does minimal editing of the data frames to assure common names.  For the U.S. state/territory file, it convets cumulative deaths into deaths reported daily.
 2. ui.R  This file defines the Shiny user interface.
@@ -79,7 +79,19 @@ The core files are
      - Inputs:  number of observations in the original data file starting with first reported death, for the specific location; the number of observations used in the regression fit; date of the first reported death; date of special cause sigal on the c-chart; the linear model list produced by the function make_location_data; the baseline days used to fit the regression model of log10 deaths.
     - Outputs: data frame used converted to an HTML table by renderDatatable.
   
-  
+
+### Key parameters
+#### global.R
+*defStartdate*:  the default Start date for analysis, set to NA to have the choice box on the user interface be blank.  Start date for analysis is typically the date of first death; however, the user may over-ride this choice by entering a date in the drop-down box 'Custom start date for calculations instead of date of first death' 
+*defBuffer*:  the default number of days to add to the display on the plot(s) after the most recent date in the reported death series.
+*defBaseline*:  the default number of days to use as the maximum number of records used in the exponential fit; however, the user may over-ride this choice by entering a number of days in the numeric input box 'Maximum days used to compute exponential growth line and limits'.
+
+#### helper.R
+function find_start_date_Provost
+  *cc_length*:  set to 20; the number of records used to compute the c-chart parameters unless there is an unusually long run of zero death days after the first death. 
+  *Provost_start_count*:  set to 8; the number of deaths to observe in the death series before starting to compute the c-chart parameters.
+  *Rule_shift_length*: set to 8; the number of consecutive values above the center line to be declared a signal of special cause on the c-chart
+
 ## Test file
 
 You can use the data file in the test_data folder to check the upload data function. Click [here](https://github.com/klittle314/Provost_control_chart/blob/master/test_data/France_test1_resort_dates.csv) to examine the test data file.  You should see screens like these if you have successfully run the Shiny app and uploaded the test file:
