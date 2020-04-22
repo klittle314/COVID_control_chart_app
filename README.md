@@ -4,7 +4,7 @@ This project implements a method based on control charts to view phases in daily
 
 ## Who can use this project?
 
-People who have a basic understanding of Shewhart control charts and want to apply control chart methods to characterize how reported deaths from COVID-19 change over time.  People who have skills in R can modify the code in order to load data sources to replace the built-in sources and to consider other measures, like hospializations or ICU cases.
+People who have a basic understanding of Shewhart control charts and want to apply control chart methods to characterize how reported deaths from COVID-19 change over time.  People who have skills in R can modify the code in order to load data sources to replace the built-in sources and to consider other measures, like hospitalizations or ICU cases.
 
 ## Getting Started
 
@@ -125,7 +125,7 @@ You can use the data file in the test_data folder to check the upload data funct
 ![calculation details](https://github.com/klittle314/Provost_control_chart/blob/master/screen_shots/2020-04-20_basic%20calculations.jpg)
 
 ## Contributing
-We have not yet set up a process to incorporate changes into the code.   Check back soon!
+We have not yet set up a process to incorporate changes into the code.   Check back in the future!
 
 ## Authors
 Kevin Little outlined the basic design and wrote most of the core functions; Mason DeCammillis built subtantial parts of the Shiny interface; Emily Jones contributed functionality and participated with Lynda Finn to suggest enhancements to the initial design.
