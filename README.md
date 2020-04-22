@@ -69,7 +69,7 @@ The core files are
             
 - make_location_data:  A function that calls find_start_date_Provost function and create_stages_Provost to create data frames for plotting
   - Inputs:  input data frame, specified location, buffer days at end of observed data, baseline days used to fit the regression model of log10 deaths, and start date for analysis
-  - Outputs:  data frame for specified location dates, deaths, and stages; data frame with fitted values and limits dervied from the regression model of log10 deaths; list of date of first death, date of special cause signal on c-chart, c-chart center line and upper control limit, linear model list from the regression fit.
+  - Outputs:  data frame for the specified location that has dates, deaths, and stages; data frame with fitted values and limits derived from the regression model of log10 deaths; list of date of first death, date of special cause signal on c-chart, c-chart center line and upper control limit, linear model list from the regression fit.
   
  - make_charts:  A function that produces all the ggplot2 objects presented by the ui
     - Inputs:  specified location, buffer days at end of observed data, output list from function make__location_data, title for the basic graph, caption for the basic graph, logical variable to determine whether the scale of the basic chart is constrained to twice the maximum of the data.
