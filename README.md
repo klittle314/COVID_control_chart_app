@@ -90,11 +90,22 @@ The core files are
 
 #### helper.R
 function find_start_date_Provost
+
   *cc_length*:  set to 20; the number of records used to compute the c-chart parameters unless there is an unusually long run of zero death days after the first death. 
   
   *Provost_start_count*:  set to 8; the number of deaths to observe in the death series before starting to compute the c-chart parameters.
   
   *Rule_shift_length*: set to 8; the number of consecutive values above the center line to be declared a signal of special cause on the c-chart
+  
+  function create_stages_Provost
+  *min_length_chart*: set to 5; the minimum number of days with deaths > 0 to use in computing the exponential fit (linear fit based on log10(deaths).
+  
+### Notes on computations related to the fit of the regression line
+#### Calculation of the control chart limits using residuals from linear regression on log10 deaths
+The code uses the median moving range to estimate 'sigma-hat'.  Hence the multiplier 3.14 to compute the upper and lower control limits.  The median moving range is more robust to one or two large point to point ranges than the average moving range.   Usually, use of the average moving range requires two stages:  examine moving ranges to determine if there are any that are unusually large on a chart of moving ranges; discard any ranges that exceed the upper control limit on the range chart, and recalculate the limits on the individuals chart.
+
+#### Use of 95% confidence interval for the slope of the regression fit
+In function make_charts, we use the lower bound of the 95% confidence interval to determine whether or not the slope is meaningfully different from zero.
 
 ## Test file
 
