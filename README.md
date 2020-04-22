@@ -35,7 +35,7 @@ if (!file.exists(data_file_state)) {
 
 ### Copying the code for local use
 
-[Click here to download the latest version](https://github.com/klittle314/Provost_control_chart/archive/master.zip) 
+[Click here to download the latest version](https://github.com/klittle314/COVID_control_chart_app/archive/master.zip) 
 
 Make sure you have installed the following libraries and dependencies; these are shown at the top of the global.R file.  
 
@@ -110,19 +110,19 @@ In function make_charts, we use the lower bound of the 95% confidence interval d
 
 ## Test file
 
-You can use the data file in the test_data folder to check the upload data function. Click [here](https://github.com/klittle314/Provost_control_chart/blob/master/test_data/France_test1_resort_dates.csv) to examine the test data file.  You should see screens like these if you have successfully run the Shiny app and uploaded the test file:
+You can use the data file in the test_data folder to check the upload data function. Click [here](https://github.com/klittle314/COVID_control_chart_app/blob/master/test_data/France_test1_resort_dates.csv) to examine the test data file.  You should see screens like these if you have successfully run the Shiny app and uploaded the test file:
 
 *Upload data*
-![upload data](https://github.com/klittle314/Provost_control_chart/blob/master/screen_shots/2020-04-20_Data%20Load.jpg)
+![upload data](https://github.com/klittle314/COVID_control_chart_app/blob/master/screen_shots/2020-04-20_Data%20Load.jpg)
 
 *Basic Chart*
-![basic chart](https://github.com/klittle314/Provost_control_chart/blob/master/screen_shots/2020-04-20_basic%20chart.jpg)
+![basic chart](https://github.com/klittle314/COVID_control_chart_app/blob/master/screen_shots/2020-04-20_basic%20chart.jpg)
 
 *Log Chart*
-![log chart](https://github.com/klittle314/Provost_control_chart/blob/master/screen_shots/2020-04-20_log%20chart.jpg)
+![log chart](https://github.com/klittle314/COVID_control_chart_app/blob/master/screen_shots/2020-04-20_log%20chart.jpg)
 
 *Calculations*
-![calculation details](https://github.com/klittle314/Provost_control_chart/blob/master/screen_shots/2020-04-20_basic%20calculations.jpg)
+![calculation details](https://github.com/klittle314/COVID_control_chart_app/blob/master/screen_shots/2020-04-20_basic%20calculations.jpg)
 
 ## Contributing
 We have not yet set up a process to incorporate changes into the code.   Check back in the future!
