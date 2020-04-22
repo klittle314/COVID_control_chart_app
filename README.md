@@ -1,10 +1,10 @@
 # Hybrid Shewhart Chart:  Create count plots across phases of COVID-19 infection history
 
-This project implements a method based on control charts to view phases in daily reported deaths from COVID-19. The method was developed by Lloyd Provost, Shannon Provost, Rocco Perla, Gareth Parry, Kevin Little.  The code is R and deploys a user interface using Shiny technology.  The R code transforms a time series of daily reported deaths into charts that distinguish phases of COVID-19 infection for a reporting location like a country, state or city.   You can find a description of the method [here](http://www.ihi.org/Topics/COVID-19/Documents/IHI-COVID-19-Data-Dashboard-Introduction-and-Methodology.pdf). For an introduction to the application of the method, [here](https://www.usnews.com/news/healthiest-communities/articles/2020-03-26/coronavirus-pandemic-reaching-critical-tipping-point-in-america-analysis-shows) is an article from U.S. News and World Report.
+This project implements a method based on control charts to view phases in daily reported deaths from COVID-19. The method was developed by Lloyd Provost, Shannon Provost, Rocco Perla, Gareth Parry, and Kevin Little.  The code is R and deploys a user interface using Shiny technology.  The R code transforms a time series of daily reported deaths into charts that distinguish phases of COVID-19 infection for a reporting location like a country, state or city.   You can find a description of the method [here](http://www.ihi.org/Topics/COVID-19/Documents/IHI-COVID-19-Data-Dashboard-Introduction-and-Methodology.pdf). For an introduction to the application of the method, [here](https://www.usnews.com/news/healthiest-communities/articles/2020-03-26/coronavirus-pandemic-reaching-critical-tipping-point-in-america-analysis-shows) is an article from U.S. News and World Report.
 
 ## Who can use this project?
 
-People who have a basic understanding of Shewhart control charts and want to apply control chart methods to characterize how reported deaths from COVID-19 change over time.  People who have skills in R can modify the code to load other data sources than the built-in sources and to consider other measures, like hospializations or ICU cases.
+People who have a basic understanding of Shewhart control charts and want to apply control chart methods to characterize how reported deaths from COVID-19 change over time.  People who have skills in R can modify the code in order to load data sources to replace the built-in sources and to consider other measures, like hospializations or ICU cases.
 
 ## Getting Started
 
@@ -82,11 +82,11 @@ The core files are
 
 ### Key parameters
 #### global.R
-*defStartdate*:  the default Start date for analysis, set to NA to have the choice box on the user interface be blank.  Start date for analysis is typically the date of first death; however, the user may over-ride this choice by entering a date in the drop-down box 'Custom start date for calculations instead of date of first death' 
+*defStartdate*:  the default start date for analysis, set to NA to have the choice box on the user interface be blank.  Start date for analysis is typically the date of first death; however, the user may over-ride this choice by entering a date in the drop-down box 'Custom start date for calculations instead of date of first death' 
 
 *defBuffer*:  the default number of days to add to the display on the plot(s) after the most recent date in the reported death series.
 
-*defBaseline*:  the default number of days to use as the maximum number of records used in the exponential fit; however, the user may over-ride this choice by entering a number of days in the numeric input box 'Maximum days used to compute exponential growth line and limits'.
+*defBaseline*:  the default number of days to use as the maximum number of records used in the exponential fit; however, the user may over-ride this choice by entering a number of days in the numeric input box 'Maximum days used to compute exponential growth line and limits'.  If the value for baseline days exceeds the available number of records, all available records are used.
 
 #### helper.R
 function find_start_date_Provost
@@ -97,15 +97,16 @@ function find_start_date_Provost
   
   *Rule_shift_length*: set to 8; the number of consecutive values above the center line to be declared a signal of special cause on the c-chart
   
-  function create_stages_Provost
+ function create_stages_Provost
+  
   *min_length_chart*: set to 5; the minimum number of days with deaths > 0 to use in computing the exponential fit (linear fit based on log10(deaths).
   
 ### Notes on computations related to the fit of the regression line
 #### Calculation of the control chart limits using residuals from linear regression on log10 deaths
-The code uses the median moving range to estimate 'sigma-hat'.  Hence the multiplier 3.14 to compute the upper and lower control limits.  The median moving range is more robust to one or two large point to point ranges than the average moving range.   Usually, use of the average moving range requires two stages:  examine moving ranges to determine if there are any that are unusually large on a chart of moving ranges; discard any ranges that exceed the upper control limit on the range chart, and recalculate the limits on the individuals chart.
+The code uses the median moving range to estimate 'sigma-hat' in the calculation of the individuals control chart.  Hence the multiplier 3.14 to compute the upper and lower control limits.  The median moving range is more robust to one or two large point-to-point ranges relative to the average moving range.  Usually, use of the average moving range requires two stages:  examine moving ranges to determine if there are any that are unusually large on a chart of moving ranges; discard any ranges that exceed the upper control limit on the range chart, and recalculate the limits on the individuals chart.  We chose to use the median approach to simplify the derivation of the individuals control chart limits.
 
 #### Use of 95% confidence interval for the slope of the regression fit
-In function make_charts, we use the lower bound of the 95% confidence interval to determine whether or not the slope is meaningfully different from zero.
+In function make_charts, we use the lower bound of the 95% confidence interval derived from the linear regression model to determine whether or not the slope is meaningfully different from zero.  If the lower bound is less than zero, we report the linear regression parameters on the calculations tab but do not show an expoential fit and exponential limits in the basic display, nor do we show the log10 chart.
 
 ## Test file
 
