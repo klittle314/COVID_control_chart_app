@@ -83,13 +83,17 @@ The core files are
 ### Key parameters
 #### global.R
 *defStartdate*:  the default Start date for analysis, set to NA to have the choice box on the user interface be blank.  Start date for analysis is typically the date of first death; however, the user may over-ride this choice by entering a date in the drop-down box 'Custom start date for calculations instead of date of first death' 
+
 *defBuffer*:  the default number of days to add to the display on the plot(s) after the most recent date in the reported death series.
+
 *defBaseline*:  the default number of days to use as the maximum number of records used in the exponential fit; however, the user may over-ride this choice by entering a number of days in the numeric input box 'Maximum days used to compute exponential growth line and limits'.
 
 #### helper.R
 function find_start_date_Provost
   *cc_length*:  set to 20; the number of records used to compute the c-chart parameters unless there is an unusually long run of zero death days after the first death. 
+  
   *Provost_start_count*:  set to 8; the number of deaths to observe in the death series before starting to compute the c-chart parameters.
+  
   *Rule_shift_length*: set to 8; the number of consecutive values above the center line to be declared a signal of special cause on the c-chart
 
 ## Test file
