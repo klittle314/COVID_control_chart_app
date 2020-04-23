@@ -51,7 +51,7 @@ Alternatively, if you understand how repositories work, you can fork the master 
 
 ### Structure of the Shiny app
 The core files are
-1. global.R  This file loads the data from external websites for country and U.S. state/territory COVID daily data.  It also does minimal editing of the data frames to assure common names.  For the U.S. state/territory file, it convets cumulative deaths into deaths reported daily.
+1. global.R  This file loads the data from external websites for country and U.S. state/territory COVID daily data.  It also does minimal editing of the data frames to assure common names.  For the U.S. state/territory file, it converts cumulative deaths into deaths reported daily.
 2. ui.R  This file defines the Shiny user interface.
 3. server.R  This file provides the reactive functions that take default and user-defined inputs to create summary charts and tables.
 4. helper.R  This file contains the core functions.   In addition to several small auxiliary functions, the main functions are:
