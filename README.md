@@ -84,17 +84,19 @@ The core files are
 #### global.R
 *defStartdate*:  the default start date for analysis, set to NA to have the choice box on the user interface be blank.  Start date for analysis is typically the date of first death; however, the user may over-ride this choice by entering a date in the drop-down box 'Custom start date for calculations instead of date of first death' 
 
-*defBuffer*:  the default number of days to add to the display on the plot(s) after the most recent date in the reported death series.
+*defBuffer*:  the default number of days to add to the display on the plot(s) after the most recent date in the reported death series.  Set to 7 days.
 
-*defBaseline*:  the default number of days to use as the maximum number of records used in the exponential fit; however, the user may over-ride this choice by entering a number of days in the numeric input box 'Maximum days used to compute exponential growth line and limits'.  If the value for baseline days exceeds the available number of records, all available records are used.
+*defBaseline*:  the default number of days to use as the maximum number of records used in the exponential fit; however, the user may over-ride this choice by entering a number of days in the numeric input box 'Maximum days used to compute exponential growth line and limits'.  If the value for baseline days exceeds the available number of records, all available records are used.  Set to 20 days.
 
 #### helper.R
 function find_start_date_Provost
 
   *cc_length*:  set to 20; the number of records used to compute the c-chart parameters unless there is an unusually long run of zero death days after the first death. 
   
-  *Provost_start_count*:  set to 8; the number of deaths to observe in the death series before starting to compute the c-chart parameters.
+  *Australia_nudge*:  set to 5; an adjustment to the cc_length in honor of Australia which @4-12-2020 had an initial series length 25 and    then c-chart signal at the next record.  Series characterized by long strings of zeros in initial set of records.
   
+  *Provost_start_count*:  set to 8; the number of deaths to observe in the death series before starting to compute the c-chart parameters.
+   
   *Rule_shift_length*: set to 8; the number of consecutive values above the center line to be declared a signal of special cause on the c-chart
   
  function create_stages_Provost
