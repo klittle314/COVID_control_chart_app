@@ -77,7 +77,7 @@ The core files are
   
  - make_computation_table:   A function that produces the elements in the table presented on the calculation details tab
      - Inputs:  number of observations in the original data file starting with first reported death, for the specific location; the number of observations used in the regression fit; date of the first reported death; date of special cause sigal on the c-chart; the linear model list produced by the function make_location_data; the baseline days used to fit the regression model of log10 deaths.
-    - Outputs: data frame used converted to an HTML table by renderDatatable.
+    - Outputs:  data frame converted to an HTML table by renderDatatable.
   
 
 ### Key parameters
